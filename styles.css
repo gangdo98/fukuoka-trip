@@ -295,7 +295,7 @@ ul,ol{padding:0;list-style:none}
 }
 .leaflet-container{font-family:var(--sans);background:#EFE9DD}
 .leaflet-popup-content-wrapper{border-radius:14px;box-shadow:0 14px 34px -18px rgba(30,18,10,.6);padding:0}
-.leaflet-popup-content{margin:0;padding:14px 15px 13px;width:230px!important;line-height:1.55}
+.leaflet-popup-content{margin:0;padding:14px 15px 13px;width:230px!important;line-height:1.55;word-break:keep-all}
 .leaflet-popup-tip{box-shadow:none}
 .pop__day{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--pin,#C8402F)}
 .pop__title{display:block;margin-top:3px;font-size:14.5px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
@@ -303,7 +303,7 @@ ul,ol{padding:0;list-style:none}
 .pop__link{
   display:inline-flex;align-items:center;gap:5px;margin-top:9px;
   font-size:12px;font-weight:700;color:#fff;background:var(--pin,#C8402F);
-  padding:7px 10px;border-radius:8px;
+  padding:7px 10px;border-radius:8px;white-space:nowrap;max-width:100%;
 }
 
 /* ---------- Shopping ---------- */
