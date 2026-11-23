@@ -375,7 +375,7 @@ ul,ol{padding:0;list-style:none}
 .taxfree__steps li::before{
   content:counter(tf);position:absolute;left:0;top:2px;
   width:14px;height:14px;border-radius:50%;
-  background:#DCEAE0;color:#2C5C4C;
+  background:var(--green);color:#fff;
   font-size:9px;font-weight:800;display:grid;place-items:center;
   font-variant-numeric:tabular-nums;
 }

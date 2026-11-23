@@ -394,8 +394,8 @@
         <article class="lug">
           <header class="lug__head">
             <span class="lug__tag">${esc(i.tag)}</span>
-            <h3>${esc(i.title)}</h3>
             ${i.kg ? `<span class="lug__kg">${esc(i.kg)}</span>` : ''}
+            <h3>${esc(i.title)}</h3>
           </header>
           <ul class="lug__list">${i.body.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>
         </article>`).join('');
