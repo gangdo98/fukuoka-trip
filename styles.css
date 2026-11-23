@@ -59,9 +59,10 @@ ul,ol{padding:0;list-style:none}
 .hero__veil{
   position:absolute;inset:0;z-index:-1;
   background:
-    linear-gradient(90deg,rgba(12,8,4,.94) 0%,rgba(12,8,4,.80) 36%,rgba(12,8,4,.42) 62%,rgba(12,8,4,.08) 100%),
-    linear-gradient(180deg,rgba(12,8,4,.38) 0%,rgba(12,8,4,.14) 30%,rgba(12,8,4,.86) 100%),
-    radial-gradient(120% 80% at 50% 100%,rgba(70,22,12,.42),transparent 66%);
+    linear-gradient(90deg,rgba(12,8,4,.55) 0%,rgba(12,8,4,.30) 42%,rgba(12,8,4,.06) 72%,rgba(12,8,4,0) 100%),
+    linear-gradient(180deg,rgba(12,8,4,.38) 0%,rgba(12,8,4,.12) 30%,rgba(12,8,4,.84) 100%),
+    radial-gradient(62% 92% at 24% 74%,rgba(9,5,2,.9) 0%,rgba(9,5,2,.58) 46%,rgba(9,5,2,0) 76%),
+    radial-gradient(120% 80% at 50% 100%,rgba(70,22,12,.34),transparent 66%);
 }
 .hero__inner{width:100%;max-width:880px;margin:0 auto}
 .hero__kicker{
