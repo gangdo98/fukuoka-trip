@@ -59,8 +59,8 @@ ul,ol{padding:0;list-style:none}
 .hero__veil{
   position:absolute;inset:0;z-index:-1;
   background:
-    linear-gradient(90deg,rgba(14,9,5,.88) 0%,rgba(14,9,5,.62) 34%,rgba(14,9,5,.24) 60%,rgba(14,9,5,.06) 100%),
-    linear-gradient(180deg,rgba(14,9,5,.34) 0%,rgba(14,9,5,.12) 32%,rgba(14,9,5,.82) 100%),
+    linear-gradient(90deg,rgba(12,8,4,.94) 0%,rgba(12,8,4,.80) 36%,rgba(12,8,4,.42) 62%,rgba(12,8,4,.08) 100%),
+    linear-gradient(180deg,rgba(12,8,4,.38) 0%,rgba(12,8,4,.14) 30%,rgba(12,8,4,.86) 100%),
     radial-gradient(120% 80% at 50% 100%,rgba(70,22,12,.42),transparent 66%);
 }
 .hero__inner{width:100%;max-width:880px;margin:0 auto}
@@ -71,13 +71,13 @@ ul,ol{padding:0;list-style:none}
 }
 .hero__title{
   font-family:var(--serif);
-  font-weight:700;
+  font-weight:800;
   font-size:clamp(38px,9vw,62px);
   line-height:1.12;
   letter-spacing:-.03em;
   text-shadow:0 2px 24px rgba(0,0,0,.28);
 }
-.hero__title em{font-style:normal;display:block;color:#F9E2B6;font-size:.72em;letter-spacing:.01em;margin-top:2px;text-shadow:0 2px 20px rgba(20,8,4,.7),0 1px 3px rgba(20,8,4,.6)}
+.hero__title em{font-style:normal;display:block;color:#FFEBC8;font-size:.72em;letter-spacing:.01em;margin-top:2px;text-shadow:0 2px 24px rgba(16,6,2,.9),0 1px 4px rgba(16,6,2,.75)}
 .hero__sub{margin-top:12px;font-size:14px;color:rgba(255,249,240,.86)}
 .hero__dates{margin-top:4px;font-size:15px;font-weight:600;letter-spacing:.02em;color:#FFF3DF}
 .hero__chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
