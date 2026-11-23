@@ -256,6 +256,11 @@ ul,ol{padding:0;list-style:none}
   .day{padding:18px 14px 12px}
   .stop__title{font-size:14.5px}
 }
+@media (max-width:520px){
+  .buy__row{grid-template-columns:22px 1fr}
+  .buy__price{grid-column:2;padding-top:1px;color:var(--accent)}
+  .store{padding:18px 15px 14px}
+}
 
 /* ---------- Map ---------- */
 .map-filters{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none}
