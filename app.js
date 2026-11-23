@@ -121,8 +121,10 @@
     }
     const origin = pts[0];
     const dest = pts[pts.length - 1];
-    const mid = pts.slice(1, -1).slice(0, 9);
     const coord = (p) => `${p.lat},${p.lng}`;
+    const mid = pts.slice(1, -1)
+      .filter((p) => coord(p) !== coord(origin) && coord(p) !== coord(dest))
+      .slice(0, 9);
     let url = `https://www.google.com/maps/dir/?api=1&origin=${coord(origin)}&destination=${coord(dest)}`;
     if (mid.length) url += `&waypoints=${mid.map(coord).join('%7C')}`;
     url += `&travelmode=${day.travelmode || 'walking'}`;
