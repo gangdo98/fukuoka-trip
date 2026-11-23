@@ -11,7 +11,7 @@
     food: '식사', meal: '식사', shop: '쇼핑', sight: '산책',
     move: '이동', stay: '숙소', pack: '포장'
   };
-  const STORE_COLORS = { dept: '#C8402F', akachan: '#2F6D5B', online: '#3A4E7A' };
+  const STORE_COLORS = { dept: '#C8402F', akachan: '#2F6D5B', online: '#3A4E7A', laraport: '#9A6B2F', mixed: '#4A423A' };
 
   let trip = null;
   let map = null;
@@ -131,6 +131,26 @@
     return url;
   }
 
+  /* 면세(텍스리펀) 안내 — 일정 카드와 매장 카드에서 같은 모양으로 씁니다. */
+  function taxFreeBlocks(tf) {
+    if (!tf) return '';
+    const list = Array.isArray(tf) ? tf : [tf];
+    return list.map((t) => {
+      const steps = (t.steps || []).map((s) => `<li>${esc(s)}</li>`).join('');
+      const notes = (t.notes || []).map((n) => `<li>${esc(n)}</li>`).join('');
+      return `
+        <div class="taxfree">
+          <div class="taxfree__head">
+            <span class="taxfree__badge">TAX FREE</span>
+            ${t.place ? `<span class="taxfree__place">${esc(t.place)}</span>` : ''}
+          </div>
+          ${t.where ? `<p class="taxfree__where">${esc(t.where)}</p>` : ''}
+          ${steps ? `<ol class="taxfree__steps">${steps}</ol>` : ''}
+          ${notes ? `<ul class="taxfree__notes">${notes}</ul>` : ''}
+        </div>`;
+    }).join('');
+  }
+
   function metaChips(it) {
     const chips = [];
     if (it.hours) chips.push(`<li><span aria-hidden="true">⏰</span>${esc(it.hours)}</li>`);
@@ -161,6 +181,7 @@
                 </div>
                 ${it.place ? `<p class="stop__place"><svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>${esc(it.place)}</p>` : ''}
                 ${metaChips(it)}
+                ${taxFreeBlocks(it.taxFree)}
                 ${it.memo ? `<p class="stop__memo">${esc(it.memo)}</p>` : ''}
                 ${link ? `<div class="stop__actions"><a class="btn" href="${esc(link)}" target="_blank" rel="noopener" style="--day:${day.color}">Google 지도 열기 ↗</a></div>` : ''}
               </div>
@@ -317,10 +338,93 @@
   }
 
   /* ---------------- shopping ---------------- */
+  function renderBaby() {
+    const b = trip.shopping.baby;
+    if (!b) return;
+    $('#babyTitle').textContent = b.title;
+    $('#babyIntro').textContent = b.intro || '';
+    $('#babyGroups').innerHTML = b.groups.map((g) => {
+      const items = g.items.map((it) => {
+        const color = STORE_COLORS[it.shop] || '#4A423A';
+        return `
+          <li class="baby__item">
+            <div class="baby__row">
+              <span class="baby__name">${esc(it.name)}</span>
+              ${it.place ? `<span class="baby__shop" style="--c:${color}">${esc(it.place)}</span>` : ''}
+            </div>
+            ${it.price ? `<p class="baby__price">${esc(it.price)}</p>` : ''}
+            ${it.note ? `<p class="baby__note">${esc(it.note)}</p>` : ''}
+          </li>`;
+      }).join('');
+      return `
+        <article class="babygroup">
+          <header class="babygroup__head">
+            <span class="babygroup__icon" aria-hidden="true">${esc(g.icon || '🍼')}</span>
+            <div class="babygroup__title">
+              <h3>${esc(g.name)}</h3>
+              ${g.sub ? `<p>${esc(g.sub)}</p>` : ''}
+            </div>
+            <span class="babygroup__count">${g.items.length}</span>
+          </header>
+          <ul class="baby__list">${items}</ul>
+        </article>`;
+    }).join('');
+  }
+
+  function renderLoadPlan() {
+    const w = trip.shopping.weights;
+    const l = trip.shopping.luggage;
+    if (w && $('#weightCard')) {
+      $('#weightCard').innerHTML = `
+        <div class="weight-card__head">
+          <h3>${esc(w.title)}</h3>
+          ${w.lead ? `<p>${esc(w.lead)}</p>` : ''}
+        </div>
+        <ul class="weight-list">
+          ${w.items.map((i) => `
+            <li>
+              <span class="weight-list__name">${esc(i.name)}${i.memo ? `<em>${esc(i.memo)}</em>` : ''}</span>
+              <span class="weight-list__kg">${esc(i.kg)}</span>
+            </li>`).join('')}
+        </ul>
+        ${w.note ? `<p class="weight-card__note">${esc(w.note)}</p>` : ''}`;
+    }
+    if (l && $('#luggage')) {
+      $('#luggage').innerHTML = l.items.map((i) => `
+        <article class="lug">
+          <header class="lug__head">
+            <span class="lug__tag">${esc(i.tag)}</span>
+            <h3>${esc(i.title)}</h3>
+            ${i.kg ? `<span class="lug__kg">${esc(i.kg)}</span>` : ''}
+          </header>
+          <ul class="lug__list">${i.body.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>
+        </article>`).join('');
+    }
+  }
+
+  function renderShoppingLinks() {
+    const s = trip.shopping;
+    if (!s.links || !$('#refLinks')) return;
+    if (s.linksTitle) $('#linksTitle').textContent = s.linksTitle;
+    $('#refLinks').innerHTML = s.links.map((l) => `
+      <a class="reflink" href="${esc(l.url)}" target="_blank" rel="noopener">
+        <span class="reflink__icon" aria-hidden="true">🔗</span>
+        <span class="reflink__body">
+          <span class="reflink__title">${esc(l.title)}</span>
+          ${l.desc ? `<span class="reflink__desc">${esc(l.desc)}</span>` : ''}
+        </span>
+        <span class="reflink__go" aria-hidden="true">↗</span>
+      </a>`).join('');
+  }
+
   function renderShopping() {
     const s = trip.shopping;
     $('#shopHeadline').textContent = s.headline;
     $('#shopIntro').textContent = s.intro;
+
+    renderBaby();
+    renderLoadPlan();
+    renderShoppingLinks();
 
     $('#shoppingStores').innerHTML = s.stores.map((store) => {
       const color = STORE_COLORS[store.id] || '#C8402F';
@@ -339,6 +443,7 @@
           <span class="store__tag">${esc(store.tag)}</span>
           <h3>${esc(store.name)}</h3>
           <p class="store__place">${esc(store.place)}</p>
+          ${taxFreeBlocks(store.taxFree)}
           <div class="buy">${items}</div>
           <p class="store__why"><b>왜 여기서?</b> ${esc(store.why)}</p>
           <ul class="cautions">${store.cautions.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>

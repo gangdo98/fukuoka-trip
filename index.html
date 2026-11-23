@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;800&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="styles.css?v=20261123e">
+<link rel="stylesheet" href="styles.css?v=20261123f">
 </head>
 <body>
 <div class="app">
@@ -103,6 +103,15 @@
           <h2 id="shopHeadline">사야 할 것 &amp; 실전 주의사항</h2>
           <p id="shopIntro"></p>
         </div>
+        <div class="sec-head sec-head--tight">
+          <h2 id="babyTitle">육아용품 카테고리</h2>
+          <p id="babyIntro"></p>
+        </div>
+        <div id="babyGroups" class="babygroups"></div>
+        <div class="sec-head sec-head--tight">
+          <h2>구매처별 정리</h2>
+          <p>같은 물건도 어디서 사느냐에 따라 할인·면세가 달라집니다. 매장 카드의 <b>TAX FREE</b> 박스에 면세 위치와 순서를 적었습니다.</p>
+        </div>
         <div id="shoppingStores" class="stack"></div>
         <div class="sec-head sec-head--tight">
           <h2>꼭 기억할 3가지</h2>
@@ -113,6 +122,17 @@
           <p>산 물건을 어떻게 싸서 가져오는지가 절반입니다.</p>
         </div>
         <div id="packing" class="packing"></div>
+        <div class="sec-head sec-head--tight">
+          <h2>실측 무게 &amp; 3종 포장 배치표</h2>
+          <p>큰 것 셋을 다 살 때의 실제 무게와, 어느 가방에 넣을지.</p>
+        </div>
+        <div id="weightCard" class="weight-card"></div>
+        <div id="luggage" class="luggage"></div>
+        <div class="sec-head sec-head--tight">
+          <h2 id="linksTitle">참고 링크</h2>
+          <p>포장·면세 후기 원문입니다. 눌러서 바로 보세요.</p>
+        </div>
+        <div id="refLinks" class="reflinks"></div>
         <div class="checklist-card">
           <div class="checklist-card__head">
             <h3 id="checklistTitle">출국 전 챙길 것</h3>
@@ -156,6 +176,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="app.js?v=20261123e"></script>
+<script src="app.js?v=20261123f"></script>
 </body>
 </html>
