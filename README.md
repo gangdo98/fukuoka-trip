@@ -23,10 +23,13 @@ data/trip.json
     └ items[]  time, title, place, kind, lat, lng, maps, hours,
                smoking, reservation, distance, memo, optional
   shopping  쇼핑 카드·주의사항·포장 팁·체크리스트
+            baby 카테고리(그룹별 품목·가격·구매처), weights(실측 무게),
+            luggage(포장 배치), links(참고 링크)
   booking   예약 알림·메모
 ```
 
 - `kind`: `food` `meal` `shop` `sight` `move` `stay` `pack` 중 하나
+- `taxFree`: 일정 항목이나 매장 카드에 넣으면 면세 위치·순서·주의가 초록 박스로 표시됩니다(객체 또는 배열).
 - `lat`/`lng`가 있으면 지도 핀과 경로가 자동 생성됩니다.
 - `maps`를 비우면 `place` 이름으로 Google 지도 검색 링크를 만듭니다.
 - `optional: true`는 "여유 시" 항목(점선 핀).
