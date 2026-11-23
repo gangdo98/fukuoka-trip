@@ -98,14 +98,27 @@
 
   /* ---------------- itinerary ---------------- */
   function routeUrl(day) {
-    const pts = [];
-    day.items.forEach((it) => {
-      if (typeof it.lat !== 'number' || typeof it.lng !== 'number') return;
-      const last = pts[pts.length - 1];
-      if (last && last.lat === it.lat && last.lng === it.lng) return;
-      pts.push(it);
-    });
+    const collect = (includeOptional) => {
+      const pts = [];
+      day.items.forEach((it) => {
+        if (typeof it.lat !== 'number' || typeof it.lng !== 'number') return;
+        if (!includeOptional && it.optional) return;
+        const last = pts[pts.length - 1];
+        if (last && last.lat === it.lat && last.lng === it.lng) return;
+        pts.push(it);
+      });
+      return pts;
+    };
+    let pts = collect(false);
+    if (pts.length < 2) pts = collect(true);
     if (pts.length < 2) return null;
+    // 마지막 날을 뺀 나머지는 호텔로 돌아오는 경로로 마무리
+    if (day.id !== 'day4' && trip && trip.hotel) {
+      const last = pts[pts.length - 1];
+      if (last.lat !== trip.hotel.lat || last.lng !== trip.hotel.lng) {
+        pts = pts.concat([{ lat: trip.hotel.lat, lng: trip.hotel.lng }]);
+      }
+    }
     const origin = pts[0];
     const dest = pts[pts.length - 1];
     const mid = pts.slice(1, -1).slice(0, 9);
@@ -191,7 +204,7 @@
         num += 1;
         const icon = L.divIcon({
           className: '',
-          html: `<div class="pin" style="--pin:${day.color}">${num}</div>`,
+          html: `<div class="pin${it.optional ? ' pin--opt' : ''}" style="--pin:${day.color}">${num}</div>`,
           iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -14]
         });
         const m = L.marker([it.lat, it.lng], { icon, title: it.title, alt: it.title });
@@ -247,9 +260,9 @@
       return;
     }
     map = L.map(el, { scrollWheelZoom: true, zoomSnap: 0.5 }).setView([33.588, 130.405], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '&copy; OpenStreetMap &copy; CARTO'
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
     }).addTo(map);
     buildMapLayers();
     applyFilter(activeFilter);

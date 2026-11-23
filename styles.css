@@ -59,8 +59,9 @@ ul,ol{padding:0;list-style:none}
 .hero__veil{
   position:absolute;inset:0;z-index:-1;
   background:
-    linear-gradient(180deg,rgba(20,12,8,.45) 0%,rgba(20,12,8,.18) 35%,rgba(20,12,8,.72) 100%),
-    radial-gradient(120% 80% at 50% 100%,rgba(88,28,16,.55),transparent 65%);
+    linear-gradient(180deg,rgba(18,11,7,.52) 0%,rgba(18,11,7,.24) 30%,rgba(18,11,7,.86) 100%),
+    radial-gradient(95% 85% at 18% 100%,rgba(52,16,8,.82),transparent 68%),
+    radial-gradient(120% 80% at 50% 100%,rgba(88,28,16,.45),transparent 65%);
 }
 .hero__inner{width:100%;max-width:880px;margin:0 auto}
 .hero__kicker{
@@ -75,7 +76,7 @@ ul,ol{padding:0;list-style:none}
   letter-spacing:-.03em;
   text-shadow:0 2px 24px rgba(0,0,0,.28);
 }
-.hero__title em{font-style:normal;display:block;color:#F6D8A8;font-size:.72em;letter-spacing:.01em;margin-top:2px}
+.hero__title em{font-style:normal;display:block;color:#F9E2B6;font-size:.72em;letter-spacing:.01em;margin-top:2px;text-shadow:0 2px 20px rgba(20,8,4,.7),0 1px 3px rgba(20,8,4,.6)}
 .hero__sub{margin-top:12px;font-size:14px;color:rgba(255,249,240,.86)}
 .hero__dates{margin-top:4px;font-size:15px;font-weight:600;letter-spacing:.02em;color:#FFF3DF}
 .hero__chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
@@ -285,6 +286,7 @@ ul,ol{padding:0;list-style:none}
   box-shadow:0 3px 10px rgba(30,18,10,.35);
   font-family:var(--sans);
 }
+.pin--opt{opacity:.72;border-style:dashed;border-width:2px}
 .pin--hotel{
   width:34px;height:34px;border-radius:10px;background:#241F1B;font-size:15px;
   border:2.5px solid #F6D8A8;
@@ -412,8 +414,8 @@ ul,ol{padding:0;list-style:none}
 .hotel-card__top{
   padding:20px 18px 16px;
   background:
-    radial-gradient(120% 90% at 100% 0%,rgba(200,64,47,.42),transparent 60%),
-    linear-gradient(160deg,#2A211B,#1B1612);
+    radial-gradient(90% 120% at 100% 0%,rgba(200,64,47,.30),transparent 62%),
+    linear-gradient(160deg,#2B221C 0%,#211A15 58%,#1A1512 100%);
 }
 .hotel-card__label{font-size:10.5px;letter-spacing:.2em;color:#D9A66A;font-weight:800}
 .hotel-card h3{font-family:var(--serif);font-size:23px;letter-spacing:-.03em;margin-top:5px;line-height:1.3}
