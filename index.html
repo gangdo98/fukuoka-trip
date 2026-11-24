@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;800&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="styles.css?v=20261123g">
+<link rel="stylesheet" href="styles.css?v=20261124a">
 </head>
 <body>
 <div class="app">
@@ -103,6 +103,7 @@
           <h2 id="shopHeadline">사야 할 것 &amp; 실전 주의사항</h2>
           <p id="shopIntro"></p>
         </div>
+        <p class="fx-note" id="fxNoteShop"></p>
         <div class="sec-head sec-head--tight">
           <h2 id="babyTitle">육아용품 카테고리</h2>
           <p id="babyIntro"></p>
@@ -117,6 +118,11 @@
           <h2>꼭 기억할 3가지</h2>
         </div>
         <div id="shopRules" class="rules"></div>
+        <div class="sec-head sec-head--tight">
+          <h2 id="paymentTitle">결제 카드 &amp; 혜택</h2>
+          <p id="paymentLead"></p>
+        </div>
+        <div id="payment" class="payment"></div>
         <div class="sec-head sec-head--tight">
           <h2>포장 &amp; 수하물</h2>
           <p>산 물건을 어떻게 싸서 가져오는지가 절반입니다.</p>
@@ -148,13 +154,14 @@
       <div class="wrap">
         <div class="sec-head">
           <h2>항공 &amp; 숙소</h2>
-          <p>진에어 왕복 · 호텔 일 팔라조 3연박.</p>
+          <p>진에어 왕복 · 호텔 일 팔라조 3연박(아고다 예약 확정).</p>
         </div>
+        <p class="fx-note" id="fxNoteBooking"></p>
         <div id="flights" class="flights"></div>
         <div id="hotelCard" class="hotel-card"></div>
         <div class="sec-head sec-head--tight">
           <h2>예약 알림</h2>
-          <p id="reminderLead">12월 2일(화) 10:00, 두 가지를 한 번에 예약합니다.</p>
+          <p id="reminderLead">다가오는 예약 일정을 날짜순으로 정리했습니다.</p>
         </div>
         <div id="reminders" class="stack"></div>
         <div class="sec-head sec-head--tight">
@@ -167,7 +174,7 @@
 
   <footer class="footer">
     <p class="footer__dates" id="footerDates">2027.01.07 – 01.10</p>
-    <p class="footer__meta">마지막 업데이트 <span id="updated">2026-11-23</span> · 강도완 &amp; 아내</p>
+    <p class="footer__meta">마지막 업데이트 <span id="updated">2026-11-24</span> · 강도완 &amp; 아내</p>
     <p class="footer__note">일정이 바뀌면 이 페이지도 함께 바뀝니다. 문의는 도완에게 :)</p>
   </footer>
 
@@ -176,6 +183,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="app.js?v=20261123g"></script>
+<script src="app.js?v=20261124a"></script>
 </body>
 </html>

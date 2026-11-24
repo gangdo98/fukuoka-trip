@@ -75,6 +75,17 @@
 
     const d = daysUntil('2027-01-07');
     $('#dday').textContent = d > 0 ? `D-${d}` : d === 0 ? 'D-DAY' : `D+${-d}`;
+
+    // 환율 기준 한 줄 — 쇼핑/항공·숙소 탭에 같은 문구로 표시
+    const fx = m.fx;
+    if (fx) {
+      const head = [fx.label, fx.rate, fx.source ? `(${fx.source})` : ''].filter(Boolean).join(' · ');
+      ['#fxNoteShop', '#fxNoteBooking'].forEach((sel) => {
+        const el = $(sel);
+        if (!el) return;
+        el.innerHTML = `<b>${esc(head)}</b>${fx.note ? `<span>${esc(fx.note)}</span>` : ''}`;
+      });
+    }
   }
 
   async function sharePage() {
@@ -457,6 +468,16 @@
         <p>${esc(r.body)}</p>
       </article>`).join('');
 
+    if (s.payment && $('#payment')) {
+      if (s.payment.title && $('#paymentTitle')) $('#paymentTitle').textContent = s.payment.title;
+      if ($('#paymentLead')) $('#paymentLead').textContent = s.payment.lead || '';
+      $('#payment').innerHTML = s.payment.items.map((p) => `
+        <article class="paycard">
+          <h3>${esc(p.title)}</h3>
+          <ul>${(p.points || []).map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+        </article>`).join('');
+    }
+
     $('#packing').innerHTML = s.packing.map((p) => `
       <article class="pack">
         <span class="pack__icon" aria-hidden="true">${esc(p.icon)}</span>
@@ -524,6 +545,15 @@
         <p class="hotel-card__stay">${esc(h.stay)}</p>
       </div>
       <div class="hotel-card__body">
+        ${h.reservation ? `<div class="hotel-card__res">
+          <p class="hotel-card__reshead">✓ ${esc(h.reservation.status)}</p>
+          <div class="hotel-card__row"><b>예약번호</b><span>${esc(h.reservation.id)}</span></div>
+          <div class="hotel-card__row"><b>투숙객</b><span>${esc(h.reservation.guest)}</span></div>
+          <div class="hotel-card__row"><b>객실</b><span>${esc(h.reservation.room)}</span></div>
+          ${h.reservation.extras ? `<div class="hotel-card__row"><b>포함</b><span>${esc(h.reservation.extras)}</span></div>` : ''}
+          <div class="hotel-card__row"><b>결제</b><span>${esc(h.reservation.paid)}</span></div>
+          <div class="hotel-card__row"><b>취소</b><span>${esc(h.reservation.cancel)}</span></div>
+        </div>` : ''}
         <div class="hotel-card__row"><b>체크인</b><span>${esc(h.checkIn)} · 체크아웃 ${esc(h.checkOut)}</span></div>
         <div class="hotel-card__row"><b>주소</b><span>${esc(h.addressKr)}</span></div>
         <div class="hotel-card__perks">${h.perks.map((p) => `<span>${esc(p)}</span>`).join('')}</div>
@@ -546,9 +576,9 @@
             <span class="reminder__badge">${badge} · 예약</span>
             <h3>${esc(r.title)}</h3>
             <p>${esc(r.detail)}</p>
-            <div class="reminder__links">
+            ${(r.links || []).length ? `<div class="reminder__links">
               ${r.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('')}
-            </div>
+            </div>` : ''}
           </div>
         </article>`;
     }).join('');
@@ -558,9 +588,10 @@
     const rem = b.reminders[0];
     if (rem) {
       const d = daysUntil(rem.date);
+      const md = `${Number(rem.date.slice(5, 7))}월 ${Number(rem.date.slice(8, 10))}일(${rem.weekday})`;
       $('#reminderLead').textContent = d > 0
-        ? `${rem.date.slice(5, 7)}월 ${Number(rem.date.slice(8, 10))}일(${rem.weekday}) ${rem.time}, 두 가지를 한 번에 예약합니다. (${d}일 남음)`
-        : `${rem.date.slice(5, 7)}월 ${Number(rem.date.slice(8, 10))}일(${rem.weekday}) ${rem.time} 예약 건입니다.`;
+        ? `가장 가까운 일정은 ${md} ${rem.time} — ${rem.title} (${d}일 남음)`
+        : `${md} ${rem.time} — ${rem.title}`;
     }
   }
 
