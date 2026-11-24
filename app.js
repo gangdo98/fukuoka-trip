@@ -79,7 +79,7 @@
     // 환율 기준 한 줄 — 쇼핑/항공·숙소 탭에 같은 문구로 표시
     const fx = m.fx;
     if (fx) {
-      const head = [fx.label, fx.rate, fx.source ? `(${fx.source})` : ''].filter(Boolean).join(' · ');
+      const head = [fx.label, fx.rate, fx.source].filter(Boolean).join(' · ');
       ['#fxNoteShop', '#fxNoteBooking'].forEach((sel) => {
         const el = $(sel);
         if (!el) return;
