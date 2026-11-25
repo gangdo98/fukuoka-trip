@@ -517,6 +517,20 @@ ul,ol{padding:0;list-style:none}
 .paycard li::before{content:"";position:absolute;left:2px;top:7px;width:4px;height:4px;border-radius:50%;background:var(--gold)}
 
 .packing{display:grid;gap:9px;grid-template-columns:1fr}
+
+/* 진에어 위탁 4원칙 */
+.baggage{
+  margin:14px 0 16px;background:var(--paper);border:1px solid rgba(200,64,47,.28);
+  border-left:3px solid var(--red);border-radius:14px;padding:16px 17px;box-shadow:var(--shadow);
+}
+.baggage__head h3{font-family:var(--serif);font-size:16px;letter-spacing:-.02em;line-height:1.35}
+.baggage__head p{margin-top:4px;font-size:12.5px;color:var(--muted);line-height:1.6}
+.baggage__list{margin-top:12px;display:grid;gap:11px}
+@media (min-width:720px){.baggage__list{grid-template-columns:1fr 1fr;gap:12px 18px}}
+.baggage__list li{display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:start}
+.baggage__no{font-family:var(--serif);font-size:11.5px;font-weight:700;color:var(--red);letter-spacing:.12em;padding-top:2px}
+.baggage__list h4{font-size:13px;letter-spacing:-.02em;line-height:1.4}
+.baggage__list p{margin-top:3px;font-size:11.5px;color:var(--muted);line-height:1.6}
 @media (min-width:720px){.packing{grid-template-columns:1fr 1fr}}
 .pack{
   display:grid;grid-template-columns:30px 1fr;gap:10px;
@@ -551,7 +565,7 @@ ul,ol{padding:0;list-style:none}
 
 /* ---------- 출국가방 ---------- */
 .depfacts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
-@media (min-width:620px){.depfacts{grid-template-columns:repeat(5,1fr)}}
+@media (min-width:620px){.depfacts{grid-template-columns:repeat(3,1fr)}}
 .depfact{
   background:var(--paper);border:1px solid var(--line);border-radius:12px;
   padding:10px 11px;display:grid;gap:2px;min-width:0;
@@ -631,6 +645,8 @@ ul,ol{padding:0;list-style:none}
 .flight__line{flex:1;position:relative;height:16px}
 .flight__line::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line)}
 .flight__line::after{content:"✈";position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);font-size:11px;color:var(--red);background:var(--paper);padding:0 5px}
+.flight__seat{margin-top:10px;font-size:11.5px;font-weight:600;line-height:1.55;color:#1F5A46;background:rgba(47,109,91,.07);border:1px solid rgba(47,109,91,.2);border-radius:8px;padding:7px 9px}
+.flight__seat span{display:inline-block;margin-right:6px;font-size:9.5px;font-weight:800;letter-spacing:.12em;color:#2F6D5B}
 .flight__memo{margin-top:11px;font-size:12px;color:var(--muted);padding-top:10px;border-top:1px dashed var(--line-soft)}
 .flight__air{position:absolute;right:16px;top:16px;font-size:11px;font-weight:700;color:var(--muted);border:1px solid var(--line);padding:4px 8px;border-radius:999px}
 

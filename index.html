@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;800&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="styles.css?v=20261125b">
+<link rel="stylesheet" href="styles.css?v=20261125d">
 </head>
 <body>
 <div class="app">
@@ -128,8 +128,9 @@
         <div id="payment" class="payment"></div>
         <div class="sec-head sec-head--tight">
           <h2>포장 &amp; 수하물</h2>
-          <p>산 물건을 어떻게 싸서 가져오는지가 절반입니다.</p>
+          <p>개수는 상관없고 무게와 203cm만 지키면 됩니다. 박스는 그대로 각각 부치세요.</p>
         </div>
+        <div id="shopBaggage" class="baggage"></div>
         <div id="packing" class="packing"></div>
         <div class="sec-head sec-head--tight">
           <h2>실측 무게 &amp; 3종 포장 배치표</h2>
@@ -160,6 +161,7 @@
           <p id="depIntro"></p>
         </div>
         <div id="depFacts" class="depfacts"></div>
+        <div id="depBaggage" class="baggage"></div>
         <div class="checklist-card dep-summary">
           <div class="checklist-card__head">
             <h3>전체 준비</h3>
@@ -181,7 +183,7 @@
       <div class="wrap">
         <div class="sec-head">
           <h2>항공 &amp; 숙소</h2>
-          <p>진에어 왕복 · 호텔 일 팔라조 3연박(아고다 예약 확정).</p>
+          <p>진에어 왕복 좌석 32B · 32C 배정 완료 · 호텔 일 팔라조 3연박(아고다 예약 확정).</p>
         </div>
         <p class="fx-note" id="fxNoteBooking"></p>
         <div id="flights" class="flights"></div>
@@ -210,6 +212,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="app.js?v=20261125b"></script>
+<script src="app.js?v=20261125d"></script>
 </body>
 </html>

@@ -413,6 +413,27 @@
     }
   }
 
+  function renderBaggage(target) {
+    const b = trip.baggage;
+    const el = $(target);
+    if (!b || !el) return;
+    el.innerHTML = `
+      <div class="baggage__head">
+        <h3>${esc(b.title)}</h3>
+        ${b.lead ? `<p>${esc(b.lead)}</p>` : ''}
+      </div>
+      <ol class="baggage__list">
+        ${b.items.map((i) => `
+          <li>
+            <span class="baggage__no">${esc(i.no)}</span>
+            <div>
+              <h4>${esc(i.title)}</h4>
+              <p>${esc(i.body)}</p>
+            </div>
+          </li>`).join('')}
+      </ol>`;
+  }
+
   function renderShoppingLinks() {
     const s = trip.shopping;
     if (!s.links || !$('#refLinks')) return;
@@ -435,6 +456,7 @@
 
     renderBaby();
     renderLoadPlan();
+    renderBaggage('#shopBaggage');
     renderShoppingLinks();
 
     $('#shoppingStores').innerHTML = s.stores.map((store) => {
@@ -530,6 +552,8 @@
         <strong class="depfact__value">${esc(f.value)}</strong>
       </div>`).join('');
 
+    renderBaggage('#depBaggage');
+
     $('#depGroups').innerHTML = d.groups.map((g) => {
       const items = g.items.map((it, i) => {
         const id = `dep:${g.id}:${i}`;
@@ -593,7 +617,7 @@
 
     $('#flights').innerHTML = trip.flights.map((f) => `
       <article class="flight">
-        <span class="flight__air">${esc(f.airline)}</span>
+        <span class="flight__air">${esc(f.airline)}${f.flightNo ? ` ${esc(f.flightNo)}` : ''}</span>
         <p class="flight__dir">${esc(f.dir)}</p>
         <p class="flight__date">${esc(f.date)}</p>
         <div class="flight__route">
@@ -607,6 +631,7 @@
             <p class="flight__time">${esc(f.arrive)} ${esc(f.toName)}</p>
           </div>
         </div>
+        ${f.seats ? `<p class="flight__seat"><span>좌석</span>${esc(f.seats)}</p>` : ''}
         <p class="flight__memo">${esc(f.memo)}</p>
       </article>`).join('');
 
