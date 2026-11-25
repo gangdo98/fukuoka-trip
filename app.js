@@ -540,7 +540,7 @@
             <label class="dep__row ${done ? 'is-done' : ''}">
               <input class="dep__check" type="checkbox" data-check="${esc(id)}" ${done ? 'checked' : ''}>
               <span class="dep__body">
-                <span class="dep__label">${esc(it.label)}${it.tag ? `<em class="dep__tag" style="--c:${color}">${esc(it.tag)}</em>` : ''}</span>
+                <span class="dep__label"><span class="dep__text">${esc(it.label)}</span>${it.tag ? `<em class="dep__tag" style="--c:${color}">${esc(it.tag)}</em>` : ''}</span>
                 ${it.note ? `<span class="dep__note">${esc(it.note)}</span>` : ''}
               </span>
             </label>
