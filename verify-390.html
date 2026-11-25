@@ -14,9 +14,35 @@
 </head>
 <body>
 <div class="row">
-  <figure><figcaption>항공·숙소 (#booking)</figcaption><iframe src="./index.html?v=20261125d#booking" title="booking"></iframe></figure>
-  <figure><figcaption>쇼핑·포장 (#shopping)</figcaption><iframe src="./index.html?v=20261125d#shopping" title="shopping"></iframe></figure>
-  <figure><figcaption>출국가방 (#departure)</figcaption><iframe src="./index.html?v=20261125d#departure" title="departure"></iframe></figure>
+  <figure><figcaption>항공·숙소 — 좌석 배정</figcaption><iframe id="fa" src="./index.html?v=20261125d#booking" title="booking"></iframe></figure>
+  <figure><figcaption>쇼핑·포장 — 위탁 4원칙</figcaption><iframe id="fb" src="./index.html?v=20261125d#shopping" title="shopping"></iframe></figure>
+  <figure><figcaption>출국가방 — 지정석 배정 완료</figcaption><iframe id="fc" src="./index.html?v=20261125d#departure" title="departure"></iframe></figure>
 </div>
+<script>
+  // 390px 뷰포트 안에서 검증 대상 위치로만 스크롤한다(임시 검증용).
+  var n = 0;
+  var timer = setInterval(function () {
+    n++;
+    var b = document.getElementById('fb').contentWindow;
+    var c = document.getElementById('fc').contentWindow;
+    var okB = false, okC = false;
+    try {
+      var bag = b.document.getElementById('shopBaggage');
+      if (bag) {
+        b.scrollTo(0, bag.getBoundingClientRect().top + b.scrollY - 56);
+        okB = true;
+      }
+      var rows = c.document.querySelectorAll('.dep__row');
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].textContent.indexOf('32B / 32C 배정 완료') > -1) {
+          c.scrollTo(0, rows[i].getBoundingClientRect().top + c.scrollY - 150);
+          okC = true;
+          break;
+        }
+      }
+    } catch (e) {}
+    if ((okB && okC) || n > 60) clearInterval(timer);
+  }, 250);
+</script>
 </body>
 </html>
