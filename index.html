@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;800&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="styles.css?v=20261124b">
+<link rel="stylesheet" href="styles.css?v=20261125a">
 </head>
 <body>
 <div class="app">
@@ -64,6 +64,9 @@
     </button>
     <button class="tab" type="button" data-tab="shopping" aria-selected="false">
       <span class="tab__icon" aria-hidden="true">🛍</span><span>쇼핑·포장</span>
+    </button>
+    <button class="tab" type="button" data-tab="departure" aria-selected="false">
+      <span class="tab__icon" aria-hidden="true">🧳</span><span>출국가방</span>
     </button>
     <button class="tab" type="button" data-tab="booking" aria-selected="false">
       <span class="tab__icon" aria-hidden="true">✈️</span><span>항공·숙소</span>
@@ -150,6 +153,30 @@
       </div>
     </section>
 
+    <section class="panel" id="panel-departure" aria-label="출국가방" hidden>
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="depHeadline">출국가방 · 짐 싸기 체크</h2>
+          <p id="depIntro"></p>
+        </div>
+        <div id="depFacts" class="depfacts"></div>
+        <div class="checklist-card dep-summary">
+          <div class="checklist-card__head">
+            <h3>전체 준비</h3>
+            <span class="progress-label" id="depProgress">0 / 0</span>
+          </div>
+          <div class="progress" aria-hidden="true"><span id="depBar"></span></div>
+          <p class="dep-summary__hint">체크한 항목은 이 브라우저에 저장됩니다.</p>
+        </div>
+        <div id="depGroups" class="depgroups"></div>
+        <div class="sec-head sec-head--tight">
+          <h2 id="depNotesTitle">알아 둘 규정</h2>
+          <p id="depNotesLead"></p>
+        </div>
+        <ul id="depNotes" class="notes"></ul>
+      </div>
+    </section>
+
     <section class="panel" id="panel-booking" aria-label="항공, 숙소, 예약" hidden>
       <div class="wrap">
         <div class="sec-head">
@@ -183,6 +210,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="app.js?v=20261124b"></script>
+<script src="app.js?v=20261125a"></script>
 </body>
 </html>

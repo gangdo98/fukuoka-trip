@@ -500,7 +500,10 @@
       if (input.classList.contains('buy__check')) {
         input.closest('.buy__row').classList.toggle('is-done', input.checked);
       }
+      const depRow = input.closest('.dep__row');
+      if (depRow) depRow.classList.toggle('is-done', input.checked);
       updateProgress();
+      updateDepProgress();
     });
     updateProgress();
   }
@@ -511,6 +514,77 @@
     const done = boxes.filter((b) => b.checked).length;
     $('#packProgress').textContent = `${done} / ${boxes.length}`;
     $('#packBar').style.width = `${(done / boxes.length) * 100}%`;
+  }
+
+  /* ---------------- departure (출국가방) ---------------- */
+  const DEP_TAG_COLORS = { '필수': '#C8402F', '기내': '#3A4E7A', '위탁': '#9A6B2F', '현지': '#2F6D5B', '예약': '#B48A3C' };
+
+  function renderDeparture() {
+    const d = trip.departure;
+    if (!d || !$('#depGroups')) return;
+    if (d.headline) $('#depHeadline').textContent = d.headline;
+    $('#depIntro').textContent = d.intro || '';
+    $('#depFacts').innerHTML = (d.facts || []).map((f) => `
+      <div class="depfact">
+        <span class="depfact__label">${esc(f.label)}</span>
+        <strong class="depfact__value">${esc(f.value)}</strong>
+      </div>`).join('');
+
+    $('#depGroups').innerHTML = d.groups.map((g) => {
+      const items = g.items.map((it, i) => {
+        const id = `dep:${g.id}:${i}`;
+        const done = !!checks[id];
+        const color = DEP_TAG_COLORS[it.tag] || '#7A6E62';
+        return `
+          <li>
+            <label class="dep__row ${done ? 'is-done' : ''}">
+              <input class="dep__check" type="checkbox" data-check="${esc(id)}" ${done ? 'checked' : ''}>
+              <span class="dep__body">
+                <span class="dep__label">${esc(it.label)}${it.tag ? `<em class="dep__tag" style="--c:${color}">${esc(it.tag)}</em>` : ''}</span>
+                ${it.note ? `<span class="dep__note">${esc(it.note)}</span>` : ''}
+              </span>
+            </label>
+          </li>`;
+      }).join('');
+      return `
+        <article class="depgroup" id="dep-${esc(g.id)}">
+          <header class="depgroup__head">
+            <span class="depgroup__icon" aria-hidden="true">${esc(g.icon || '🧳')}</span>
+            <div class="depgroup__title">
+              <h3>${esc(g.name)}</h3>
+              ${g.sub ? `<p>${esc(g.sub)}</p>` : ''}
+            </div>
+            <span class="depgroup__count" data-dep-count="${esc(g.id)}">0/${g.items.length}</span>
+          </header>
+          <div class="progress progress--thin" aria-hidden="true"><span data-dep-bar="${esc(g.id)}"></span></div>
+          <ul class="dep__list">${items}</ul>
+        </article>`;
+    }).join('');
+
+    if (d.notesTitle) $('#depNotesTitle').textContent = d.notesTitle;
+    if ($('#depNotesLead')) $('#depNotesLead').textContent = d.notesLead || '';
+    $('#depNotes').innerHTML = (d.notes || []).map((n) => `<li>${esc(n)}</li>`).join('');
+
+    updateDepProgress();
+  }
+
+  function updateDepProgress() {
+    const boxes = $$('#depGroups [data-check]');
+    if (!boxes.length || !$('#depProgress')) return;
+    const done = boxes.filter((b) => b.checked).length;
+    const total = boxes.length;
+    $('#depProgress').textContent = `${done} / ${total}`;
+    $('#depBar').style.width = `${(done / total) * 100}%`;
+    trip.departure.groups.forEach((g) => {
+      const gb = boxes.filter((b) => b.dataset.check.startsWith(`dep:${g.id}:`));
+      const gd = gb.filter((b) => b.checked).length;
+      const count = $(`[data-dep-count="${g.id}"]`);
+      const bar = $(`[data-dep-bar="${g.id}"]`);
+      if (count) count.textContent = `${gd}/${gb.length}`;
+      if (bar) bar.style.width = `${gb.length ? (gd / gb.length) * 100 : 0}%`;
+      const card = $(`#dep-${g.id}`);
+      if (card) card.classList.toggle('is-complete', gb.length > 0 && gd === gb.length);
+    });
   }
 
   /* ---------------- booking ---------------- */
@@ -622,7 +696,7 @@
   function wireTabs() {
     $$('.tab').forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
     const h = (location.hash || '').replace('#', '');
-    if (['map', 'shopping', 'booking'].includes(h)) showTab(h, false);
+    if (['map', 'shopping', 'departure', 'booking'].includes(h)) showTab(h, false);
   }
 
   /* ---------------- boot ---------------- */
@@ -639,6 +713,7 @@
     renderItinerary();
     renderMapFilters();
     renderShopping();
+    renderDeparture();
     renderBooking();
     wireTabs();
     if (location.hash === '#map') showTab('map', false);

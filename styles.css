@@ -100,7 +100,7 @@ ul,ol{padding:0;list-style:none}
 /* ---------- Tabs ---------- */
 .tabs{
   position:sticky;top:0;z-index:60;
-  display:grid;grid-template-columns:repeat(4,1fr);
+  display:grid;grid-template-columns:repeat(5,1fr);
   background:rgba(250,246,238,.92);
   backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line);
@@ -117,6 +117,13 @@ ul,ol{padding:0;list-style:none}
 .tab:hover{color:var(--ink)}
 .tab.is-active{color:var(--red);background:rgba(200,64,47,.08)}
 .tab.is-active .tab__icon{filter:none}
+@media (max-width:430px){
+  .tab{font-size:11.5px;padding:9px 1px 8px;gap:2px;white-space:nowrap}
+  .tab__icon{font-size:15px}
+}
+@media (max-width:360px){
+  .tab{font-size:10.5px;letter-spacing:-.03em}
+}
 @media (min-width:760px){
   .tabs{display:flex;justify-content:center;gap:6px;padding:10px 20px}
   .tab{flex-direction:row;gap:8px;font-size:14px;padding:10px 22px}
@@ -541,6 +548,72 @@ ul,ol{padding:0;list-style:none}
 .checklist input:checked{background:var(--red);border-color:var(--red)}
 .checklist input:checked::after{content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translateY(-1px)}
 .checklist input:checked + span{color:var(--muted);text-decoration:line-through}
+
+/* ---------- 출국가방 ---------- */
+.depfacts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+@media (min-width:620px){.depfacts{grid-template-columns:repeat(5,1fr)}}
+.depfact{
+  background:var(--paper);border:1px solid var(--line);border-radius:12px;
+  padding:10px 11px;display:grid;gap:2px;min-width:0;
+}
+.depfact__label{font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+.depfact__value{font-size:13px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.35}
+
+.dep-summary{margin:0 0 16px}
+.dep-summary__hint{margin-top:4px;font-size:11.5px;color:var(--muted)}
+
+.depgroups{display:grid;gap:14px}
+.depgroup{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 16px 8px;box-shadow:var(--shadow);transition:border-color .2s;
+}
+.depgroup.is-complete{border-color:#CFE3D5}
+.depgroup__head{display:flex;align-items:flex-start;gap:10px}
+.depgroup__icon{
+  flex:none;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
+  background:var(--cream);border:1px solid var(--line-soft);font-size:16px;line-height:1;
+}
+.depgroup__title{flex:1;min-width:0}
+.depgroup__title h3{font-family:var(--serif);font-size:17px;letter-spacing:-.03em;line-height:1.35}
+.depgroup__title p{margin-top:2px;font-size:11.5px;color:var(--muted);line-height:1.45}
+.depgroup__count{
+  flex:none;font-size:10.5px;font-weight:800;color:var(--muted);
+  background:var(--cream);border:1px solid var(--line-soft);
+  padding:3px 7px;border-radius:999px;font-variant-numeric:tabular-nums;
+}
+.depgroup.is-complete .depgroup__count{color:var(--green);border-color:#CFE3D5;background:#F1F6F2}
+.progress--thin{height:3px;margin:11px 0 4px}
+.dep__list{display:grid}
+.dep__list > li{border-bottom:1px dashed var(--line-soft)}
+.dep__list > li:last-child{border-bottom:0}
+.dep__row{
+  display:grid;grid-template-columns:22px 1fr;gap:9px;align-items:start;
+  padding:11px 2px;cursor:pointer;border-radius:8px;
+}
+.dep__row:hover{background:var(--cream)}
+.dep__check{
+  appearance:none;margin:2px 0 0;width:18px;height:18px;border-radius:5px;
+  border:1.5px solid #CFC3AF;background:#fff;display:grid;place-items:center;cursor:pointer;
+}
+.dep__check:checked{background:var(--red);border-color:var(--red)}
+.dep__check:checked::after{content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translateY(-1px)}
+.dep__body{display:grid;gap:3px;min-width:0}
+.dep__label{font-size:13.5px;font-weight:700;line-height:1.5;letter-spacing:-.02em}
+.dep__tag{
+  font-style:normal;display:inline-block;margin-left:5px;vertical-align:1px;
+  font-size:10px;font-weight:800;letter-spacing:.02em;line-height:1.3;white-space:nowrap;
+  color:var(--c);background:color-mix(in srgb,var(--c) 9%,#fff);
+  border:1px solid color-mix(in srgb,var(--c) 24%,#fff);
+  padding:2px 6px;border-radius:5px;
+}
+.dep__note{font-size:11.5px;color:var(--muted);line-height:1.6}
+.dep__row.is-done .dep__label{color:var(--muted);text-decoration:line-through}
+.dep__row.is-done .dep__note{color:#A2968A}
+@media (max-width:430px){
+  .depgroup{padding:14px 14px 6px}
+  .depgroup__title h3{font-size:16px}
+  .dep__label{font-size:13px}
+}
 
 /* ---------- Booking ---------- */
 .flights{display:grid;gap:12px}
