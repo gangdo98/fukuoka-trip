@@ -583,6 +583,24 @@
       </ol>`;
   }
 
+  function renderRefShots() {
+    const r = trip.shopping.refShots;
+    const host = $('#refShots');
+    if (!r || !host) return;
+    if (r.title && $('#refShotTitle')) $('#refShotTitle').textContent = r.title;
+    if ($('#refShotLead')) $('#refShotLead').textContent = r.lead || '';
+    host.innerHTML = (r.items || []).map((it) => `
+      <figure class="refshot">
+        <a class="refshot__link" href="${esc(it.src)}" target="_blank" rel="noopener" aria-label="${esc(it.alt || '참고 이미지')} 크게 보기">
+          <img src="${esc(it.src)}" alt="${esc(it.alt || '')}" loading="lazy" decoding="async">
+        </a>
+        ${it.caption || (it.tags || []).length ? `<figcaption class="refshot__body">
+          ${it.caption ? `<p class="refshot__cap">${esc(it.caption)}</p>` : ''}
+          ${(it.tags || []).length ? `<ul class="refshot__tags">${it.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+        </figcaption>` : ''}
+      </figure>`).join('');
+  }
+
   function renderShoppingLinks() {
     const s = trip.shopping;
     if (!s.links || !$('#refLinks')) return;
@@ -607,6 +625,7 @@
     renderLoadPlan();
     renderBaggage('#shopBaggage');
     renderShoppingLinks();
+    renderRefShots();
 
     $('#shoppingStores').innerHTML = s.stores.map((store) => {
       const color = STORE_COLORS[store.id] || '#C8402F';
@@ -836,13 +855,33 @@
     const tr = b.airportTransfer;
     const trHost = $('#airportTransfer');
     if (tr && trHost) {
+      const fa = tr.fares;
       trHost.innerHTML = `
         <div class="transfer__head">
           <span class="transfer__label">${esc(tr.label || '공항 이동')}</span>
           <h3>${esc(tr.title || '')}</h3>
         </div>
         ${tr.body ? `<p class="transfer__body">${esc(tr.body)}</p>` : ''}
-        ${(tr.points || []).length ? `<ul class="transfer__list">${tr.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}`;
+        ${fa && (fa.rows || []).length ? `
+        <div class="tfares">
+          ${fa.title ? `<p class="tfares__title">${esc(fa.title)}</p>` : ''}
+          ${fa.lead ? `<p class="tfares__lead">${esc(fa.lead)}</p>` : ''}
+          <ul class="tfares__list">
+            ${fa.rows.map((r) => `
+              <li class="tfares__row${r.best ? ' is-best' : ''}">
+                <span class="tfares__label">${esc(r.label)}</span>
+                <span class="tfares__price">${esc(r.price)}</span>
+                ${r.note ? `<span class="tfares__note">${esc(r.note)}</span>` : ''}
+              </li>`).join('')}
+          </ul>
+          ${fa.note ? `<p class="tfares__noteall">${esc(fa.note)}</p>` : ''}
+        </div>` : ''}
+        ${(tr.points || []).length ? `<ul class="transfer__list">${tr.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}
+        ${(tr.tips || []).length ? `<div class="ttips">${tr.tips.map((t) => `
+          <div class="ttip">
+            <p class="ttip__head"><span aria-hidden="true">${esc(t.icon || '·')}</span>${esc(t.title || '')}</p>
+            ${t.body ? `<p class="ttip__body">${esc(t.body)}</p>` : ''}
+          </div>`).join('')}</div>` : ''}`;
     } else if (trHost) {
       trHost.innerHTML = '';
     }
@@ -1268,6 +1307,20 @@
       ${(cfg.tips || []).length ? `<div class="wcalc__tips">
         <p class="wcalc__tipshead">💡 ${esc(cfg.tipsTitle || 'TIP')}</p>
         <ul>${cfg.tips.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+      </div>` : ''}
+      ${cfg.packPlan ? `<div class="wcalc__plan">
+        <p class="wcalc__plantitle">${esc(cfg.packPlan.title || '')}</p>
+        ${cfg.packPlan.lead ? `<p class="wcalc__planlead">${esc(cfg.packPlan.lead)}</p>` : ''}
+        <ol class="wcalc__planlist">
+          ${(cfg.packPlan.steps || []).map((s) => `<li>
+            <span class="wcalc__planno" aria-hidden="true">${esc(s.no || '·')}</span>
+            <span class="wcalc__planbody"><b>${esc(s.label || '')}</b>${s.body ? ` — ${esc(s.body)}` : ''}</span>
+          </li>`).join('')}
+        </ol>
+      </div>` : ''}
+      ${cfg.packKeep ? `<div class="wcalc__keep">
+        <p class="wcalc__keephd">🎒 ${esc(cfg.packKeep.title || '')}</p>
+        ${cfg.packKeep.body ? `<p class="wcalc__keepbody">${esc(cfg.packKeep.body)}</p>` : ''}
       </div>` : ''}`;
     wcPaint();
     wcPaintSync();

@@ -879,7 +879,7 @@ ul,ol{padding:0;list-style:none}
 .wrap *{min-width:0}
 .store,.babygroup,.depgroup,.baggage,.checklist-card,.weight-card,.wc,.wcalc,.reflink,
 .reminder,.flight,.hotel-card,.transfer,.day,.stop__card,.rule,.paycard,.pack,.lug,
-.fx,.fxtip,.babybar,.tabs{max-width:100%}
+.fx,.fxtip,.babybar,.tabs,.tfares,.ttip,.refshot,.refshots,.wcalc__plan,.wcalc__keep{max-width:100%}
 .store h3,.store__place,.store__tag,.store__why,.cautions li,
 .buy__name,.buy__note,.buy__price,
 .baby__name,.baby__price,.baby__note,.baby__shop,
@@ -887,7 +887,9 @@ ul,ol{padding:0;list-style:none}
 .dep__label,.dep__note,.reminder h3,.reminder p,.hotel-card__row span,
 .lug__list li,.reflink__title,.reflink__desc,
 .stop__title,.stop__place,.stop__memo,.notes li,.flight__memo,
-.fx__note,.fx__rowsub,.fxtip__main,.fxtip__ex,.transfer__body,.transfer__list li{
+.fx__note,.fx__rowsub,.fxtip__main,.fxtip__ex,.transfer__body,.transfer__list li,
+.tfares__label,.tfares__price,.tfares__note,.tfares__noteall,.ttip__head,.ttip__body,
+.refshot__cap,.wcalc__planbody,.wcalc__keepbody{
   overflow-wrap:anywhere;word-break:keep-all;
 }
 .buy__price{white-space:normal;text-align:right}
@@ -1031,3 +1033,74 @@ ul,ol{padding:0;list-style:none}
   .transfer{padding:14px 14px 12px}
   .transfer h3{font-size:16px}
 }
+
+/* ---------- 택시 요금 비교 · 우버 팁 ---------- */
+.tfares{
+  margin-top:11px;background:#FBF7F0;border:1px solid var(--line);
+  border-radius:12px;padding:12px 13px;max-width:100%;
+}
+.tfares__title{font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:-.01em;line-height:1.4}
+.tfares__lead{margin-top:3px;font-size:11px;color:var(--muted);line-height:1.55}
+.tfares__list{margin-top:9px;display:grid;gap:6px}
+.tfares__row{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 8px;
+  padding:7px 9px;background:#fff;border:1px solid var(--line-soft);border-radius:9px;
+}
+.tfares__row.is-best{border-color:rgba(47,109,91,.34);background:#F3F8F4}
+.tfares__label{font-size:11.5px;font-weight:700;color:var(--ink-soft);line-height:1.45;overflow-wrap:anywhere}
+.tfares__price{
+  font-size:11.5px;font-weight:800;color:var(--red);letter-spacing:-.02em;
+  line-height:1.45;text-align:right;
+}
+.tfares__row.is-best .tfares__price{color:var(--green)}
+.tfares__note{grid-column:1/-1;font-size:10.5px;color:var(--muted);line-height:1.45;overflow-wrap:anywhere}
+.tfares__noteall{margin-top:8px;font-size:10.5px;color:var(--muted);line-height:1.55;overflow-wrap:anywhere}
+@media (max-width:360px){
+  .tfares__row{grid-template-columns:minmax(0,1fr)}
+  .tfares__price{text-align:left}
+}
+.ttips{margin-top:12px;display:grid;gap:8px}
+.ttip{background:#FBF7F0;border:1px solid var(--line);border-radius:11px;padding:10px 12px;max-width:100%}
+.ttip__head{font-size:12px;font-weight:800;color:var(--ink);letter-spacing:-.01em;line-height:1.45;overflow-wrap:anywhere}
+.ttip__head span{margin-right:5px}
+.ttip__body{margin-top:3px;font-size:11.5px;color:var(--muted);line-height:1.65;overflow-wrap:anywhere}
+
+/* ---------- 쇼핑 · 포장 참고 이미지 ---------- */
+.refshots{display:grid;gap:14px}
+.refshot{
+  margin:0;background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--radius);padding:11px;box-shadow:var(--shadow);
+  max-width:100%;overflow:hidden;
+}
+.refshot__link{display:block;border-radius:12px;overflow:hidden;background:var(--cream);line-height:0}
+.refshot img{display:block;width:100%;height:auto;max-width:100%}
+.refshot__body{margin-top:10px}
+.refshot__cap{font-size:12px;color:var(--ink-soft);line-height:1.65;overflow-wrap:anywhere}
+.refshot__tags{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+.refshot__tags li{
+  font-size:10.5px;font-weight:700;color:var(--ochre);
+  background:#F4EFE4;border:1px solid var(--line);border-radius:99px;padding:3px 8px;line-height:1.3;
+}
+@media (max-width:430px){
+  .refshot{padding:9px}
+  .refshot__cap{font-size:11.5px}
+}
+
+/* ---------- 무게 계산기 포장 플랜 ---------- */
+.wcalc__plan{
+  margin-top:10px;background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:12px 13px;max-width:100%;
+}
+.wcalc__plantitle{font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:-.01em;line-height:1.45}
+.wcalc__planlead{margin-top:3px;font-size:11px;color:var(--muted);line-height:1.55}
+.wcalc__planlist{margin-top:9px;display:grid;gap:7px}
+.wcalc__planlist li{display:grid;grid-template-columns:16px minmax(0,1fr);gap:7px;align-items:start}
+.wcalc__planno{font-size:12px;font-weight:800;color:var(--gold);line-height:1.45}
+.wcalc__planbody{font-size:11.5px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere}
+.wcalc__planbody b{color:var(--ink-soft);font-weight:800}
+.wcalc__keep{
+  margin-top:9px;background:#F4EFE4;border:1px solid var(--line);
+  border-left:3px solid var(--gold);border-radius:11px;padding:11px 13px;max-width:100%;
+}
+.wcalc__keephd{font-size:12px;font-weight:800;color:var(--ochre);letter-spacing:-.01em;line-height:1.45}
+.wcalc__keepbody{margin-top:3px;font-size:11.5px;color:var(--ink-soft);line-height:1.65;overflow-wrap:anywhere}
