@@ -819,7 +819,7 @@
         <form class="wc__add" data-wc-add="${kind}">
           <input type="text" data-wc-new="name" placeholder="아이템 이름" maxlength="40" autocomplete="off" aria-label="추가할 아이템 이름">
           <div class="wc__addrow">
-            <input type="number" inputmode="decimal" step="0.1" min="0" data-wc-new="kg" placeholder="0" aria-label="추가할 아이템 무게 kg">
+            <input type="number" inputmode="decimal" step="0.1" min="0" data-wc-new="kg" placeholder="무게" aria-label="추가할 아이템 무게 kg">
             <em>kg</em>
             <button type="submit">추가</button>
           </div>
