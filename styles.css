@@ -855,3 +855,179 @@ ul,ol{padding:0;list-style:none}
   .hero__media,.hero__veil,.tabs,.share,.route-btn,.stop__actions{display:none}
   .day,.store,.flight,.reminder,.hotel-card{box-shadow:none;break-inside:avoid}
 }
+
+/* ================= 계산기 탭 · 모바일 잘림 수정 (2026-11-26) ================= */
+
+/* ---------- 탭 6개 ---------- */
+.tabs{grid-template-columns:repeat(6,1fr)}
+.tab__sub{
+  display:block;margin-top:1px;
+  font-size:9px;font-weight:600;letter-spacing:-.02em;line-height:1.15;opacity:.72;
+}
+@media (max-width:430px){
+  .tab__sub{font-size:8.5px}
+}
+@media (min-width:760px){
+  .tab__sub{display:none}
+}
+.sec-head h2 .sec-head__sub{
+  font-family:var(--sans);font-size:.6em;font-weight:700;
+  color:var(--muted);letter-spacing:-.01em;
+}
+
+/* ---------- 모바일 가로 잘림 방지 ---------- */
+.wrap *{min-width:0}
+.store,.babygroup,.depgroup,.baggage,.checklist-card,.weight-card,.wc,.wcalc,.reflink,
+.reminder,.flight,.hotel-card,.transfer,.day,.stop__card,.rule,.paycard,.pack,.lug,
+.fx,.fxtip,.babybar,.tabs{max-width:100%}
+.store h3,.store__place,.store__tag,.store__why,.cautions li,
+.buy__name,.buy__note,.buy__price,
+.baby__name,.baby__price,.baby__note,.baby__shop,
+.taxfree__place,.taxfree__where,.taxfree__steps li,.taxfree__notes li,
+.dep__label,.dep__note,.reminder h3,.reminder p,.hotel-card__row span,
+.lug__list li,.reflink__title,.reflink__desc,
+.stop__title,.stop__place,.stop__memo,.notes li,.flight__memo,
+.fx__note,.fx__rowsub,.fxtip__main,.fxtip__ex,.transfer__body,.transfer__list li{
+  overflow-wrap:anywhere;word-break:keep-all;
+}
+.buy__price{white-space:normal;text-align:right}
+@media (max-width:520px){
+  .buy__row{grid-template-columns:22px minmax(0,1fr)}
+  .buy__price{grid-column:2;text-align:left}
+}
+
+/* ---------- 육아용품 구매 체크 ---------- */
+.babybar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:-8px 0 12px}
+.babybar__sum{font-size:11.5px;color:var(--muted);line-height:1.4}
+.babybar__sum b{font-size:12.5px;font-weight:800;color:var(--red);font-variant-numeric:tabular-nums}
+.baby__head{
+  flex:1 1 200px;display:grid;grid-template-columns:18px minmax(0,1fr);gap:8px;
+  align-items:start;min-width:0;cursor:pointer;
+}
+.baby__check{
+  appearance:none;flex:none;margin:3px 0 0;width:18px;height:18px;border-radius:5px;
+  border:1.5px solid #CFC3AF;background:#fff;display:grid;place-items:center;cursor:pointer;
+}
+.baby__check:checked{background:var(--green);border-color:var(--green)}
+.baby__check:checked::after{
+  content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;
+  transform:rotate(-45deg) translateY(-1px);
+}
+.baby__flag{
+  display:none;flex:none;font-size:9.5px;font-weight:800;letter-spacing:.02em;
+  color:#fff;background:var(--green);border-radius:5px;padding:2px 6px;line-height:1.3;
+}
+.baby__item.is-done .baby__flag{display:inline-block}
+.baby__item.is-done .baby__name{text-decoration:line-through;color:var(--muted)}
+.baby__item.is-done .baby__price,.baby__item.is-done .baby__note{opacity:.5}
+.babygroup__count.is-complete{color:var(--green);border-color:#CFE3D5;background:#F1F6F2}
+
+/* ---------- 동기화 칩 (무게·육아 공통) ---------- */
+.synchip{
+  display:inline-flex;align-items:center;gap:5px;min-width:0;
+  font-size:10.5px;font-weight:700;color:var(--muted);
+  background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:4px 9px;
+}
+.synchip i{width:6px;height:6px;border-radius:50%;background:#C3B6A4;flex:none}
+.synchip[data-state="on"]{color:var(--green);border-color:#CFE3D5;background:#F1F6F2}
+.synchip[data-state="on"] i{background:var(--green)}
+.synchip__text{min-width:0;overflow-wrap:anywhere}
+
+/* ---------- 엔화 ↔ 원화 계산기 ---------- */
+.fx{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:17px 16px 15px;box-shadow:var(--shadow);
+}
+.fx__head h3{font-family:var(--serif);font-size:17.5px;letter-spacing:-.03em;line-height:1.35}
+.fx__lead{margin-top:4px;font-size:12px;color:var(--muted);line-height:1.55}
+.fx__rate{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:13px}
+.fx__ratefield{
+  display:inline-flex;align-items:center;gap:6px;min-width:0;
+  background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:7px 10px;
+}
+.fx__ratelabel{font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+.fx__ratefield input{
+  width:74px;min-width:0;border:0;border-bottom:1px dashed var(--line);background:transparent;
+  font:inherit;font-size:15px;font-weight:800;color:var(--ink);text-align:right;
+  font-variant-numeric:tabular-nums;padding:0 0 1px;
+}
+.fx__ratefield em{font-style:normal;font-size:11px;font-weight:700;color:var(--muted)}
+.fx__refresh{
+  flex:none;font-size:11px;font-weight:700;color:var(--ink-soft);
+  border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 10px;
+}
+.fx__refresh:disabled{opacity:.45}
+.fx__amount{display:block;margin-top:13px}
+.fx__amountlabel{display:block;font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+.fx__amountrow{
+  display:flex;align-items:center;gap:7px;min-width:0;
+  margin-top:3px;border-bottom:1.5px solid var(--line);padding-bottom:6px;
+}
+.fx__amountrow em{font-style:normal;font-size:17px;font-weight:800;color:var(--gold);line-height:1}
+.fx__amountrow input{
+  flex:1 1 auto;width:100%;min-width:0;border:0;background:transparent;
+  font:inherit;font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--ink);
+  font-variant-numeric:tabular-nums;padding:0;
+}
+.fx__conv{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:13px;color:var(--muted);line-height:1.5}
+.fx__conv b{font-size:21px;font-weight:800;color:var(--red);letter-spacing:-.03em}
+.fx__convsub{font-size:11px;color:var(--muted)}
+.fx__before{margin-top:2px;font-size:11px;color:var(--muted)}
+.fx__rows{margin-top:12px;display:grid;gap:2px;border-top:1px solid var(--line-soft)}
+.fx__row{display:grid;gap:2px;padding:9px 2px;border-bottom:1px dashed var(--line-soft)}
+.fx__rowhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-width:0}
+.fx__rowname{min-width:0;font-size:12.5px;font-weight:600;line-height:1.45;color:var(--ink-soft)}
+.fx__rowval{
+  flex:none;font-size:14.5px;font-weight:800;color:var(--ink);
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+}
+.fx__rowsub{font-style:normal;font-size:10.5px;color:var(--muted);line-height:1.5}
+.fx__row--total{
+  margin-top:3px;padding:11px 10px;border-bottom:0;border-radius:10px;
+  background:linear-gradient(90deg,rgba(200,64,47,.08),rgba(200,64,47,0));
+}
+.fx__row--total .fx__rowname{color:var(--red);font-weight:800}
+.fx__row--total .fx__rowval{color:var(--red);font-size:16px}
+.fx__note{
+  margin-top:11px;font-size:11px;color:var(--muted);line-height:1.65;
+  background:var(--cream);border-radius:9px;padding:9px 11px;
+}
+.fx__note b{color:var(--ink-soft)}
+@media (max-width:430px){
+  .fx{padding:15px 14px 13px}
+  .fx__amountrow input{font-size:21px}
+  .fx__conv b{font-size:19px}
+  .fx__rowval{font-size:13.5px}
+}
+
+/* ---------- 엔화 암산 팁 ---------- */
+.fxtip{
+  margin-top:12px;background:#F4EFE4;border:1px solid var(--line);
+  border-left:3px solid var(--gold);border-radius:12px;padding:13px 14px;
+}
+.fxtip__head{font-size:12.5px;font-weight:800;color:var(--ochre);letter-spacing:-.01em}
+.fxtip__list{margin-top:8px;display:grid;gap:8px}
+.fxtip__list li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:8px;align-items:start}
+.fxtip__no{font-size:12px;font-weight:800;color:var(--gold);line-height:1.45}
+.fxtip__main{font-size:12.5px;font-weight:700;color:var(--ink-soft);line-height:1.55}
+.fxtip__ex{margin-top:1px;font-size:11.5px;color:var(--muted);line-height:1.5}
+
+/* ---------- 귀국일 큰 택시 안내 ---------- */
+.transfer{
+  margin-top:14px;background:var(--paper);
+  border:1px solid rgba(180,138,60,.42);border-left:4px solid var(--gold);
+  border-radius:14px;padding:16px 17px;box-shadow:var(--shadow);
+}
+.transfer__label{
+  display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.12em;
+  color:#fff;background:var(--gold);padding:3px 7px;border-radius:5px;
+}
+.transfer h3{font-family:var(--serif);font-size:17px;letter-spacing:-.03em;line-height:1.35;margin-top:8px}
+.transfer__body{margin-top:6px;font-size:12.5px;color:var(--ink-soft);line-height:1.7}
+.transfer__list{margin-top:9px;display:grid;gap:5px}
+.transfer__list li{position:relative;padding-left:13px;font-size:11.5px;color:var(--muted);line-height:1.6}
+.transfer__list li::before{content:"";position:absolute;left:2px;top:7px;width:4px;height:4px;border-radius:50%;background:var(--gold)}
+@media (max-width:430px){
+  .transfer{padding:14px 14px 12px}
+  .transfer h3{font-size:16px}
+}

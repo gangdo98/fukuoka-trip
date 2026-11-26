@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;800&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="styles.css?v=20261126e">
+<link rel="stylesheet" href="styles.css?v=20261126f">
 </head>
 <body>
 <div class="app">
@@ -64,6 +64,9 @@
     </button>
     <button class="tab" type="button" data-tab="shopping" aria-selected="false">
       <span class="tab__icon" aria-hidden="true">🛍</span><span>쇼핑·포장</span>
+    </button>
+    <button class="tab" type="button" data-tab="calc" aria-selected="false">
+      <span class="tab__icon" aria-hidden="true">🧮</span><span>계산기<span class="tab__sub">무게/환율</span></span>
     </button>
     <button class="tab" type="button" data-tab="departure" aria-selected="false">
       <span class="tab__icon" aria-hidden="true">🧳</span><span>출국가방</span>
@@ -111,6 +114,10 @@
           <h2 id="babyTitle">육아용품 카테고리</h2>
           <p id="babyIntro"></p>
         </div>
+        <div class="babybar">
+          <p class="babybar__sum"><b id="babySum">0 / 0</b> 샀어요</p>
+          <span class="synchip" id="babySync" data-state="off"><i aria-hidden="true"></i><span class="synchip__text">이 폰에만 저장</span></span>
+        </div>
         <div id="babyGroups" class="babygroups"></div>
         <div class="sec-head sec-head--tight">
           <h2>구매처별 정리</h2>
@@ -133,10 +140,6 @@
         <div id="shopBaggage" class="baggage"></div>
         <div id="packing" class="packing"></div>
         <div class="sec-head sec-head--tight">
-          <h2 id="weightCalcTitle">수하물 무게 계산기</h2>
-        </div>
-        <div id="weightCalc" class="wcalc"></div>
-        <div class="sec-head sec-head--tight">
           <h2>실측 무게 &amp; 3종 포장 배치표</h2>
           <p>큰 것 셋을 다 살 때의 실제 무게와, 어느 가방에 넣을지.</p>
         </div>
@@ -155,6 +158,20 @@
           <div class="progress" aria-hidden="true"><span id="packBar"></span></div>
           <ul id="packList" class="checklist"></ul>
         </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-calc" aria-label="계산기 무게 환율" hidden>
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>계산기 <span class="sec-head__sub">무게 / 환율</span></h2>
+          <p>엔화 금액을 넣으면 기본 환산부터 5% 게스트 쿠폰·면세 환급·농협 10% 적립까지 한 번에 계산합니다. 그 아래에서 수하물 무게도 함께 확인하세요.</p>
+        </div>
+        <div id="fxCalc" class="fxcalc"></div>
+        <div class="sec-head sec-head--tight">
+          <h2>수하물 무게 계산기</h2>
+        </div>
+        <div id="weightCalc" class="wcalc"></div>
       </div>
     </section>
 
@@ -192,6 +209,7 @@
         <p class="fx-note" id="fxNoteBooking"></p>
         <div id="flights" class="flights"></div>
         <div id="hotelCard" class="hotel-card"></div>
+        <div id="airportTransfer" class="transfer"></div>
         <div class="sec-head sec-head--tight">
           <h2>예약 알림</h2>
           <p id="reminderLead">다가오는 예약 일정을 날짜순으로 정리했습니다.</p>
@@ -218,6 +236,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-<script src="app.js?v=20261126e"></script>
+<script src="app.js?v=20261126f"></script>
 </body>
 </html>

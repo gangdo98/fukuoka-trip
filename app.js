@@ -349,18 +349,163 @@
   }
 
   /* ---------------- shopping ---------------- */
+  /* 육아용품 구매 체크 — 도완 폰 ↔ 명주 폰 (tosil_story/trip/fukuoka/shopping) */
+  const BC_KEY = 'fukuoka-baby-checks-v1';
+  const BC_PATH = 'tosil_story/trip/fukuoka/shopping';
+  const bc = {
+    data: null, ref: null, wired: false, syncTried: false, seen: 0,
+    pushTimer: null, syncState: { state: 'off', text: '이 폰에만 저장' }
+  };
+
+  const babyCheckId = (g, i) => `baby:${g.id}:${i + 1}`;
+
+  function bcNormalize(raw) {
+    const out = { rev: Number(raw && raw.rev) || 0, checks: {} };
+    const src = raw && raw.checks && typeof raw.checks === 'object' ? raw.checks : {};
+    Object.keys(src).forEach((k) => { if (src[k]) out.checks[k] = true; });
+    return out;
+  }
+  function bcLoad() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(BC_KEY));
+      if (raw) return bcNormalize(raw);
+    } catch (e) { /* 사생활 모드 */ }
+    return { rev: 0, checks: {} };
+  }
+  function bcStore() {
+    try { localStorage.setItem(BC_KEY, JSON.stringify(bc.data)); } catch (e) { /* 사생활 모드 */ }
+  }
+
+  function bcPaintSync() {
+    const el = $('#babySync');
+    if (!el) return;
+    el.dataset.state = bc.syncState.state;
+    const t = $('.synchip__text', el);
+    if (t) t.textContent = bc.syncState.text;
+  }
+
+  function bcPaint() {
+    const b = trip.shopping && trip.shopping.baby;
+    if (!b) return;
+    let total = 0;
+    let done = 0;
+    b.groups.forEach((g) => {
+      let gd = 0;
+      g.items.forEach((it, i) => { if (bc.data.checks[babyCheckId(g, i)]) gd += 1; });
+      total += g.items.length;
+      done += gd;
+      const count = $(`[data-baby-count="${g.id}"]`);
+      if (count) {
+        count.textContent = `${gd}/${g.items.length}`;
+        count.classList.toggle('is-complete', gd === g.items.length);
+      }
+    });
+    const sum = $('#babySum');
+    if (sum) sum.textContent = `${done} / ${total}`;
+  }
+
+  function bcPush() {
+    if (!bc.ref) return;
+    bc.data.rev = Math.max(Number(bc.data.rev) || 0, Number(bc.seen) || 0) + 1;
+    bcStore();
+    try {
+      bc.ref.set(bc.data).catch(() => {
+        bc.syncState = { state: 'off', text: '동기화 안 됨 · 이 폰에만 저장' };
+        bcPaintSync();
+      });
+    } catch (e) { /* 오프라인이면 localStorage에만 남아요 */ }
+  }
+  function bcPushSoon() {
+    clearTimeout(bc.pushTimer);
+    bc.pushTimer = setTimeout(bcPush, 500);
+  }
+
+  function bcApplyRemote(raw) {
+    const next = bcNormalize(raw);
+    if (!next.rev || next.rev <= bc.data.rev) return false;
+    bc.data = next;
+    bcStore();
+    renderBaby();
+    return true;
+  }
+
+  function bcInitSync() {
+    if (bc.syncTried) return;
+    bc.syncTried = true;
+    if (!window.firebase || typeof window.firebase.database !== 'function') {
+      bc.syncState = { state: 'off', text: '이 폰에만 저장' };
+      bcPaintSync();
+      return;
+    }
+    try {
+      const app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(WC_FB_CONFIG);
+      const db = firebase.database(app);
+      bc.ref = db.ref(BC_PATH);
+
+      db.ref('.info/connected').on('value', (snap) => {
+        const on = snap.val() === true;
+        bc.syncState = on
+          ? { state: 'on', text: '부부 실시간 동기화 중' }
+          : { state: 'off', text: '연결 대기 중 · 이 폰에 저장' };
+        bcPaintSync();
+      });
+
+      bc.ref.on('value', (snap) => {
+        const val = snap.val();
+        if (!val || typeof val !== 'object' || val.rev == null) {
+          if (Object.keys(bc.data.checks).length) bcPush();  // DB가 비어 있으면 이 폰 상태를 올려 둬요
+          return;
+        }
+        bc.seen = Number(val.rev) || 0;
+        if (bcApplyRemote(val)) return;
+        if ((Number(bc.data.rev) || 0) > bc.seen) bcPush();  // 오프라인에 체크한 내 상태가 더 최신
+      }, () => {
+        bc.syncState = { state: 'off', text: '동기화 안 됨 · 이 폰에만 저장' };
+        bcPaintSync();
+      });
+    } catch (e) {
+      bc.syncState = { state: 'off', text: '이 폰에만 저장' };
+      bcPaintSync();
+    }
+  }
+
+  function wireBaby() {
+    if (bc.wired) return;
+    const host = $('#babyGroups');
+    if (!host) return;
+    bc.wired = true;
+    host.addEventListener('change', (e) => {
+      const box = e.target.closest('[data-baby-check]');
+      if (!box) return;
+      const id = box.dataset.babyCheck;
+      const row = box.closest('.baby__item');
+      if (box.checked) bc.data.checks[id] = true; else delete bc.data.checks[id];
+      if (row) row.classList.toggle('is-done', box.checked);
+      bcStore();
+      bcPaint();
+      bcPushSoon();
+    });
+  }
+
   function renderBaby() {
     const b = trip.shopping.baby;
     if (!b) return;
+    if (!bc.data) bc.data = bcLoad();
     $('#babyTitle').textContent = b.title;
     $('#babyIntro').textContent = b.intro || '';
     $('#babyGroups').innerHTML = b.groups.map((g) => {
-      const items = g.items.map((it) => {
+      const items = g.items.map((it, i) => {
         const color = STORE_COLORS[it.shop] || '#4A423A';
+        const id = babyCheckId(g, i);
+        const done = !!bc.data.checks[id];
         return `
-          <li class="baby__item">
+          <li class="baby__item ${done ? 'is-done' : ''}" data-baby-item="${esc(id)}">
             <div class="baby__row">
-              <span class="baby__name">${esc(it.name)}</span>
+              <label class="baby__head">
+                <input class="baby__check" type="checkbox" data-baby-check="${esc(id)}" ${done ? 'checked' : ''}>
+                <span class="baby__name">${esc(it.name)}</span>
+              </label>
+              <span class="baby__flag" aria-hidden="true">✓ 샀어요</span>
               ${it.place ? `<span class="baby__shop" style="--c:${color}">${esc(it.place)}</span>` : ''}
             </div>
             ${it.price ? `<p class="baby__price">${esc(it.price)}</p>` : ''}
@@ -375,11 +520,15 @@
               <h3>${esc(g.name)}</h3>
               ${g.sub ? `<p>${esc(g.sub)}</p>` : ''}
             </div>
-            <span class="babygroup__count">${g.items.length}</span>
+            <span class="babygroup__count" data-baby-count="${esc(g.id)}">0/${g.items.length}</span>
           </header>
           <ul class="baby__list">${items}</ul>
         </article>`;
     }).join('');
+    bcPaint();
+    wireBaby();
+    bcPaintSync();
+    bcInitSync();
   }
 
   function renderLoadPlan() {
@@ -684,6 +833,20 @@
 
     $('#bookingNotes').innerHTML = b.notes.map((n) => `<li>${esc(n)}</li>`).join('');
 
+    const tr = b.airportTransfer;
+    const trHost = $('#airportTransfer');
+    if (tr && trHost) {
+      trHost.innerHTML = `
+        <div class="transfer__head">
+          <span class="transfer__label">${esc(tr.label || '공항 이동')}</span>
+          <h3>${esc(tr.title || '')}</h3>
+        </div>
+        ${tr.body ? `<p class="transfer__body">${esc(tr.body)}</p>` : ''}
+        ${(tr.points || []).length ? `<ul class="transfer__list">${tr.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}`;
+    } else if (trHost) {
+      trHost.innerHTML = '';
+    }
+
     const rem = b.reminders[0];
     if (rem) {
       const d = daysUntil(rem.date);
@@ -692,6 +855,238 @@
         ? `가장 가까운 일정은 ${md} ${rem.time} — ${rem.title} (${d}일 남음)`
         : `${md} ${rem.time} — ${rem.title}`;
     }
+  }
+
+  /* ---------------- 엔화 ↔ 원화 계산기 (실시간 환율) ---------------- */
+  const FX_KEY = 'fukuoka-fx-v1';
+  const FX_API = 'https://open.er-api.com/v6/latest/JPY';
+  const fx = { rate: 0, amount: 0, manual: false, state: 'default', stamp: '', wired: false, fetching: false };
+
+  const fxCfg = () => (trip && trip.shopping ? trip.shopping.fxCalc : null) || {};
+  const fxRate = () => Number(fx.rate) || 0;
+  const wonFmt = (n) => `${Math.round(n).toLocaleString('ko-KR')}원`;
+  const yenFmt = (n) => `${Math.round(n).toLocaleString('ko-KR')}엔`;
+
+  function fxLoad() {
+    const cfg = fxCfg();
+    fx.amount = Number(cfg.amountDefault) || 10000;
+    let stored = null;
+    try { stored = JSON.parse(localStorage.getItem(FX_KEY)); } catch (e) { /* 사생활 모드 */ }
+    if (stored && Number(stored.rate) > 0) {
+      fx.rate = Math.round(Number(stored.rate) * 100) / 100;
+      fx.manual = !!stored.manual;
+      fx.state = fx.manual ? 'manual' : 'default';
+      fx.stamp = stored.stamp || '';
+    } else {
+      fx.rate = Number(cfg.defaultRate) || 843.9;
+    }
+  }
+  function fxStore() {
+    try {
+      localStorage.setItem(FX_KEY, JSON.stringify({ rate: fx.rate, manual: fx.manual, stamp: fx.stamp }));
+    } catch (e) { /* 사생활 모드 */ }
+  }
+
+  function fxStamp() {
+    if (!fx.stamp) return '';
+    const d = new Date(fx.stamp);
+    if (isNaN(d.getTime())) return '';
+    return new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(d);
+  }
+
+  function fxPaintStatus() {
+    const el = $('#fxStatus');
+    if (!el) return;
+    const cfg = fxCfg();
+    let state = 'off';
+    let text = '';
+    if (fx.state === 'live') {
+      state = 'on';
+      text = `실시간 환율${fxStamp() ? ` · ${fxStamp()}` : ''}`;
+    } else if (fx.state === 'manual') {
+      state = 'off';
+      text = '직접 넣은 환율';
+    } else {
+      state = 'off';
+      text = `기본값 ${cfg.rateAsOf || ''} 확인`.trim();
+    }
+    el.dataset.state = state;
+    const t = $('.synchip__text', el);
+    if (t) t.textContent = text;
+    const btn = $('#fxRefresh');
+    if (btn) btn.disabled = fx.fetching;
+  }
+
+  function fxPaint() {
+    const cfg = fxCfg();
+    const rate = fxRate();
+    const yen = Math.max(0, Number(fx.amount) || 0);
+    const per = rate / 100;
+    const sale = 1 - (Number(cfg.guestCoupon) || 5) / 100;
+    const refund = 1 - (Number(cfg.taxRefund) || 7.7) / 100;
+    const reward = 1 - (Number(cfg.cardReward) || 10) / 100;
+    const pretax = yen / 1.1;
+    const payCoupon = pretax * sale * 1.1;   // 5% 게스트 쿠폰 후 세금 포함 결제액
+    const vals = {
+      base: yen * per,
+      coupon: payCoupon * per,
+      taxfree: yen * refund * per,
+      card: yen * reward * per,
+      all: payCoupon * refund * reward * per
+    };
+    const baseEl = $('#fxBase');
+    if (baseEl) baseEl.textContent = wonFmt(vals.base);
+    const baseSub = $('#fxBaseSub');
+    if (baseSub) baseSub.textContent = `¥${Math.round(yen).toLocaleString('ko-KR')} · 100엔 = ${rate.toFixed(2)}원`;
+    const before = $('#fxBefore');
+    if (before) before.textContent = `세전으로는 ¥${Math.round(pretax).toLocaleString('ko-KR')} (소비세 10% 빼면)`;
+
+    const set = (key, main, sub) => {
+      const v = $(`[data-fx-val="${key}"]`);
+      const s = $(`[data-fx-sub="${key}"]`);
+      if (v) v.textContent = main;
+      if (s) s.textContent = sub || '';
+    };
+    set('base', wonFmt(vals.base), `¥${Math.round(yen).toLocaleString('ko-KR')} × ${rate.toFixed(2)} ÷ 100`);
+    set('coupon', wonFmt(vals.coupon), `결제 ${yenFmt(payCoupon)} · 세전가에서 5% 할인`);
+    set('taxfree', wonFmt(vals.taxfree), `환급 후 ${yenFmt(yen * refund)} · 실환급률 ${Number(cfg.taxRefund) || 7.7}%`);
+    set('card', wonFmt(vals.card), `적립 반영 ${yenFmt(yen * reward)} · 1인 연 10만P 한도`);
+    const save = vals.base > 0 ? Math.round((1 - vals.all / vals.base) * 100) : 0;
+    set('all', wonFmt(vals.all), `약 ${save}% 절약 · ${wonFmt(vals.base - vals.all)} 덜 냄`);
+  }
+
+  async function fxFetch() {
+    if (fx.fetching) return;
+    fx.fetching = true;
+    fxPaintStatus();
+    try {
+      const res = await fetch(FX_API, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const per100 = Number(json && json.rates && json.rates.KRW) * 100;
+      if (!isFinite(per100) || per100 <= 0) throw new Error('KRW 없음');
+      if (!fx.manual) {
+        fx.rate = Math.round(per100 * 100) / 100;
+        const input = $('#fxRate');
+        if (input) input.value = fx.rate.toFixed(2);
+      }
+      fx.state = fx.manual ? 'manual' : 'live';
+      fx.stamp = new Date().toISOString();
+      fxStore();
+      fxPaint();
+    } catch (e) {
+      if (fx.state !== 'manual') fx.state = 'default';
+    } finally {
+      fx.fetching = false;
+      fxPaintStatus();
+    }
+  }
+
+  function renderFx() {
+    const host = $('#fxCalc');
+    const cfg = fxCfg();
+    if (!host || !cfg.title) return;
+    if (!fx.rate) fxLoad();
+    const tips = (cfg.tips || []).map((t, i) => `
+      <li>
+        <span class="fxtip__no" aria-hidden="true">${['①', '②', '③', '④', '⑤'][i] || i + 1}</span>
+        <div>
+          <p class="fxtip__main">${esc(t.main)}</p>
+          ${t.example ? `<p class="fxtip__ex">${esc(t.example)}</p>` : ''}
+        </div>
+      </li>`).join('');
+
+    host.innerHTML = `
+      <section class="fx">
+        <header class="fx__head">
+          <h3>${esc(cfg.title)}</h3>
+          ${cfg.lead ? `<p class="fx__lead">${esc(cfg.lead)}</p>` : ''}
+        </header>
+        <div class="fx__rate">
+          <label class="fx__ratefield">
+            <span class="fx__ratelabel">100엔 =</span>
+            <input id="fxRate" type="number" inputmode="decimal" step="0.01" min="1" value="${fx.rate.toFixed(2)}" aria-label="100엔당 원화 환율">
+            <em>원</em>
+          </label>
+          <span class="synchip fx__stamp" id="fxStatus" data-state="off"><i aria-hidden="true"></i><span class="synchip__text">기본값</span></span>
+          <button class="fx__refresh" id="fxRefresh" type="button">↻ 최신 환율</button>
+        </div>
+        <label class="fx__amount">
+          <span class="fx__amountlabel">엔화 금액 (세금 포함)</span>
+          <span class="fx__amountrow"><em>¥</em><input id="fxYen" type="number" inputmode="numeric" step="100" min="0" value="${fx.amount}" aria-label="엔화 금액"></span>
+        </label>
+        <p class="fx__conv">≈ <b id="fxBase">—</b><span class="fx__convsub" id="fxBaseSub"></span></p>
+        <p class="fx__before" id="fxBefore"></p>
+        <ul class="fx__rows">
+          <li class="fx__row">
+            <div class="fx__rowhead"><span class="fx__rowname">기본 원화 환산</span><b class="fx__rowval" data-fx-val="base">—</b></div>
+            <em class="fx__rowsub" data-fx-sub="base"></em>
+          </li>
+          <li class="fx__row">
+            <div class="fx__rowhead"><span class="fx__rowname">백화점 5% 게스트 쿠폰 적용</span><b class="fx__rowval" data-fx-val="coupon">—</b></div>
+            <em class="fx__rowsub" data-fx-sub="coupon"></em>
+          </li>
+          <li class="fx__row">
+            <div class="fx__rowhead"><span class="fx__rowname">면세 환급 적용가</span><b class="fx__rowval" data-fx-val="taxfree">—</b></div>
+            <em class="fx__rowsub" data-fx-sub="taxfree"></em>
+          </li>
+          <li class="fx__row">
+            <div class="fx__rowhead"><span class="fx__rowname">NH농협 10% 적립 체감가</span><b class="fx__rowval" data-fx-val="card">—</b></div>
+            <em class="fx__rowsub" data-fx-sub="card"></em>
+          </li>
+          <li class="fx__row fx__row--total">
+            <div class="fx__rowhead"><span class="fx__rowname">5% + 면세 + 농협 10% 동시 적용</span><b class="fx__rowval" data-fx-val="all">—</b></div>
+            <em class="fx__rowsub" data-fx-sub="all"></em>
+          </li>
+        </ul>
+        <p class="fx__note">입력 금액은 <b>세금 포함(세후) 태그 가격</b> 기준입니다. 5% 게스트 쿠폰은 세전가에 붙고(카드 영문명·여권 이름이 같아야 함), 면세는 수수료를 뺀 실환급률 ${Number(cfg.taxRefund) || 7.7}% · 공항 세관 확인 뒤 환급입니다. 농협 적립은 ${esc(cfg.cardNote || '')}</p>
+      </section>
+      <div class="fxtip">
+        <p class="fxtip__head">💡 ${esc(cfg.tipTitle || '엔화 암산 팁')}</p>
+        <ol class="fxtip__list">${tips}</ol>
+      </div>`;
+
+    fxPaint();
+    fxPaintStatus();
+    wireFx();
+    fxFetch();
+  }
+
+  function wireFx() {
+    if (fx.wired) return;
+    const host = $('#fxCalc');
+    if (!host) return;
+    fx.wired = true;
+
+    host.addEventListener('input', (e) => {
+      if (e.target.id === 'fxRate') {
+        const n = Number(String(e.target.value).replace(',', '.'));
+        if (!isFinite(n) || n <= 0) return;
+        fx.rate = Math.round(n * 100) / 100;
+        fx.manual = true;
+        fx.state = 'manual';
+        fxStore();
+        fxPaint();
+        fxPaintStatus();
+        return;
+      }
+      if (e.target.id === 'fxYen') {
+        const n = Number(String(e.target.value).replace(',', ''));
+        fx.amount = isFinite(n) && n >= 0 ? n : 0;
+        fxPaint();
+      }
+    });
+
+    host.addEventListener('click', (e) => {
+      if (e.target.closest('#fxRefresh')) {
+        fx.manual = false;
+        fx.state = 'default';
+        fxStore();
+        fxPaintStatus();
+        fxFetch();
+        toast('최신 환율을 불러오는 중…');
+      }
+    });
   }
 
   /* ---------------- 수하물 무게 계산기 (도완 폰 ↔ 명주 폰) ---------------- */
@@ -1083,7 +1478,7 @@
   function wireTabs() {
     $$('.tab').forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
     const h = (location.hash || '').replace('#', '');
-    if (['map', 'shopping', 'departure', 'booking'].includes(h)) showTab(h, false);
+    if (['map', 'shopping', 'calc', 'departure', 'booking'].includes(h)) showTab(h, false);
   }
 
   /* ---------------- boot ---------------- */
@@ -1100,6 +1495,7 @@
     renderItinerary();
     renderMapFilters();
     renderShopping();
+    renderFx();
     renderWeightCalc();
     renderDeparture();
     renderBooking();
