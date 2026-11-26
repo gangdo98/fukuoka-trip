@@ -694,6 +694,368 @@
     }
   }
 
+  /* ---------------- 수하물 무게 계산기 (도완 폰 ↔ 명주 폰) ---------------- */
+  const WC_KEY = 'fukuoka-luggage-v1';
+  const WC_FB_CONFIG = {
+    apiKey: 'AIzaSyCgZ6AYYIxzbEe135USUhTX_pB684zita8',
+    authDomain: 'tosil-story.firebaseapp.com',
+    databaseURL: 'https://tosil-story-default-rtdb.firebaseio.com',
+    projectId: 'tosil-story',
+    storageBucket: 'tosil-story.firebasestorage.app',
+    messagingSenderId: '407302916302',
+    appId: '1:407302916302:web:f62c3acaea531fae18689f'
+  };
+  // tosil-story의 체크 상태(tosil_story/state/checks)와 섞이지 않도록 여행 전용 경로에 씁니다.
+  const WC_PATH = 'tosil_story/trip/fukuoka/luggage';
+  const wc = {
+    data: null, ref: null, wired: false, syncTried: false, seen: 0,
+    pushTimer: null, delTimer: null, pendingRender: false,
+    syncState: { state: 'off', text: '이 기기에만 저장' }
+  };
+
+  const wcConfig = () => (trip && trip.shopping ? trip.shopping.weightCalc : null);
+
+  const wcNum = (v) => {
+    const n = Number(String(v == null ? '' : v).replace(',', '.'));
+    return isFinite(n) && n >= 0 ? Math.round(n * 10) / 10 : null;
+  };
+  const kgText = (n) => {
+    const r = Math.round((Number(n) || 0) * 10) / 10;
+    return Number.isInteger(r) ? String(r) : r.toFixed(1);
+  };
+
+  function wcDefaults() {
+    const cfg = wcConfig() || {};
+    const build = (src, kind) => ({
+      total: Number(src && src.total) || 0,
+      items: ((src && src.items) || []).map((it, i) => ({
+        id: it.id || `${kind}-${i + 1}`,
+        name: it.name || '',
+        kg: Number(it.kg) || 0,
+        note: it.note || ''
+      }))
+    });
+    return { rev: 0, cabin: build(cfg.cabin, 'cabin'), checked: build(cfg.checked, 'checked') };
+  }
+
+  function wcNormalize(raw) {
+    const def = wcDefaults();
+    if (!raw || typeof raw !== 'object') return def;
+    const one = (src, fb, kind) => {
+      const s = src && typeof src === 'object' ? src : {};
+      const list = Array.isArray(s.items) ? s.items
+        : (s.items && typeof s.items === 'object' ? Object.keys(s.items).map((k) => s.items[k]) : fb.items);
+      const total = Number(s.total);
+      return {
+        total: isFinite(total) && total >= 0 ? Math.round(total * 10) / 10 : fb.total,
+        items: list.filter((it) => it && typeof it === 'object').map((it, i) => ({
+          id: String(it.id || `${kind}-${Date.now()}-${i}`),
+          name: String(it.name == null ? '' : it.name),
+          kg: isFinite(Number(it.kg)) && Number(it.kg) >= 0 ? Math.round(Number(it.kg) * 10) / 10 : 0,
+          note: String(it.note == null ? '' : it.note)
+        }))
+      };
+    };
+    return {
+      rev: Number(raw.rev) || 0,
+      cabin: one(raw.cabin, def.cabin, 'cabin'),
+      checked: one(raw.checked, def.checked, 'checked')
+    };
+  }
+
+  function wcLoad() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(WC_KEY));
+      return raw ? wcNormalize(raw) : wcDefaults();
+    } catch (e) { return wcDefaults(); }
+  }
+  function wcStore() {
+    try { localStorage.setItem(WC_KEY, JSON.stringify(wc.data)); } catch (e) { /* 사생활 모드 */ }
+  }
+
+  function wcRows(kind) {
+    const items = wc.data[kind].items;
+    if (!items.length) {
+      return `<li class="wc__empty">${kind === 'cabin' ? '아직 기내 아이템이 없어요.' : '아직 아이템이 없어요.'} 아래에서 이름과 무게를 넣어 추가하세요.</li>`;
+    }
+    return items.map((it) => `
+      <li class="wc__row" data-id="${esc(it.id)}">
+        <div class="wc__rowmain">
+          <input class="wc__name" type="text" value="${esc(it.name)}" maxlength="40" autocomplete="off"
+                 data-wc-field="name" data-id="${esc(it.id)}" data-kind="${kind}" aria-label="아이템 이름">
+          <span class="wc__kgwrap">
+            <input class="wc__kg" type="number" inputmode="decimal" step="0.1" min="0" value="${kgText(it.kg)}"
+                   data-wc-field="kg" data-id="${esc(it.id)}" data-kind="${kind}" aria-label="무게 kg"><em>kg</em>
+          </span>
+          <button class="wc__del" type="button" data-wc-del="${esc(it.id)}" data-kind="${kind}" aria-label="${esc(it.name)} 삭제">✕</button>
+        </div>
+        ${it.note ? `<p class="wc__note">${esc(it.note)}</p>` : ''}
+      </li>`).join('');
+  }
+
+  function wcCard(kind, cfg) {
+    const state = wc.data[kind];
+    const icon = kind === 'cabin' ? '🎒' : '🧳';
+    return `
+      <article class="wc wc--${kind}">
+        <header class="wc__head">
+          <span class="wc__icon" aria-hidden="true">${icon}</span>
+          <div class="wc__title">
+            <h3>${esc(cfg.label || (kind === 'cabin' ? '기내 수하물' : '위탁 수하물'))}</h3>
+            ${cfg.hint ? `<p>${esc(cfg.hint)}</p>` : ''}
+          </div>
+        </header>
+        <div class="wc__stats">
+          <label class="wc__allow">
+            <span>${esc(cfg.totalLabel || '총 허용')}</span>
+            <span class="wc__allowrow"><input type="number" inputmode="decimal" step="0.5" min="0"
+              data-wc-total="${kind}" value="${kgText(state.total)}"><em>kg</em></span>
+          </label>
+          <div class="wc__stat"><span>사용</span><strong data-wc-used="${kind}">0kg</strong></div>
+          <div class="wc__stat"><span>잔여</span><strong data-wc-left="${kind}">0kg</strong></div>
+        </div>
+        <div class="wc__meter" aria-hidden="true"><span data-wc-bar="${kind}"></span></div>
+        <ul class="wc__list" data-wc-list="${kind}">${wcRows(kind)}</ul>
+        <form class="wc__add" data-wc-add="${kind}">
+          <input type="text" data-wc-new="name" placeholder="아이템 이름" maxlength="40" autocomplete="off" aria-label="추가할 아이템 이름">
+          <div class="wc__addrow">
+            <input type="number" inputmode="decimal" step="0.1" min="0" data-wc-new="kg" placeholder="0" aria-label="추가할 아이템 무게 kg">
+            <em>kg</em>
+            <button type="submit">추가</button>
+          </div>
+        </form>
+      </article>`;
+  }
+
+  function wcPaintSync() {
+    const el = $('#wcSync');
+    if (!el) return;
+    el.dataset.state = wc.syncState.state;
+    const t = $('.wc__synctext', el);
+    if (t) t.textContent = wc.syncState.text;
+  }
+
+  function wcPaint() {
+    ['cabin', 'checked'].forEach((kind) => {
+      const state = wc.data[kind];
+      const used = state.items.reduce((s, it) => s + (Number(it.kg) || 0), 0);
+      const total = Number(state.total) || 0;
+      const left = Math.round((total - used) * 10) / 10;
+      const usedEl = $(`[data-wc-used="${kind}"]`);
+      const leftEl = $(`[data-wc-left="${kind}"]`);
+      const bar = $(`[data-wc-bar="${kind}"]`);
+      if (usedEl) usedEl.textContent = `${kgText(used)}kg`;
+      if (leftEl) {
+        leftEl.textContent = left >= 0 ? `${kgText(left)}kg` : `초과 ${kgText(-left)}kg`;
+        leftEl.classList.toggle('is-over', left < 0);
+      }
+      if (bar) {
+        bar.style.width = `${total > 0 ? Math.min(100, (used / total) * 100) : 0}%`;
+        bar.classList.toggle('is-over', left < 0);
+      }
+    });
+  }
+
+  function wcRender() {
+    const host = $('#weightCalc');
+    const cfg = wcConfig();
+    if (!host) return;
+    if (!cfg || !wc.data) { host.innerHTML = ''; return; }
+    host.innerHTML = `
+      <div class="wcalc__bar">
+        <p class="wcalc__lead">${esc(cfg.lead || '')}</p>
+        <span class="wcalc__sync" id="wcSync" data-state="off"><i aria-hidden="true"></i><span class="wc__synctext">이 기기에만 저장</span></span>
+      </div>
+      <div class="wcalc__grid">
+        ${wcCard('cabin', cfg.cabin || {})}
+        ${wcCard('checked', cfg.checked || {})}
+      </div>
+      ${(cfg.tips || []).length ? `<div class="wcalc__tips">
+        <p class="wcalc__tipshead">💡 ${esc(cfg.tipsTitle || 'TIP')}</p>
+        <ul>${cfg.tips.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+      </div>` : ''}`;
+    wcPaint();
+    wcPaintSync();
+  }
+
+  function wcPush() {
+    if (!wc.ref) return;
+    // 폰 시계 차이에 흔들리지 않도록 "본 적 있는 최신 번호 + 1"로 올립니다.
+    wc.data.rev = Math.max(Number(wc.data.rev) || 0, Number(wc.seen) || 0) + 1;
+    wcStore();
+    try {
+      wc.ref.set(wc.data).catch(() => {
+        wc.syncState = { state: 'off', text: '동기화 안 됨 · 이 폰에만 저장' };
+        wcPaintSync();
+      });
+    } catch (e) { /* 오프라인이면 localStorage에만 남아요 */ }
+  }
+  function wcPushSoon() {
+    clearTimeout(wc.pushTimer);
+    wc.pushTimer = setTimeout(wcPush, 700);
+  }
+
+  function wcApplyRemote(raw) {
+    const next = wcNormalize(raw);
+    if (!next.rev) return false;
+    if (next.rev <= wc.data.rev) return false;
+    wc.data = next;
+    wcStore();
+    const host = $('#weightCalc');
+    if (host && host.contains(document.activeElement)) wc.pendingRender = true;
+    else wcRender();
+    return true;
+  }
+
+  function wcInitSync() {
+    if (wc.syncTried) return;
+    wc.syncTried = true;
+    if (!window.firebase || typeof window.firebase.database !== 'function') {
+      wc.syncState = { state: 'off', text: '이 기기에만 저장' };
+      wcPaintSync();
+      return;
+    }
+    try {
+      const app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(WC_FB_CONFIG);
+      const db = firebase.database(app);
+      wc.ref = db.ref(WC_PATH);
+
+      db.ref('.info/connected').on('value', (snap) => {
+        const on = snap.val() === true;
+        wc.syncState = on
+          ? { state: 'on', text: '부부 실시간 동기화 중' }
+          : { state: 'off', text: '연결 대기 중 · 이 폰에 저장' };
+        wcPaintSync();
+      });
+
+      wc.ref.on('value', (snap) => {
+        const val = snap.val();
+        if (!val || typeof val !== 'object' || val.rev == null) {
+          wcPush();   // DB가 비어 있으면 이 폰 목록을 올려 둬요
+          return;
+        }
+        wc.seen = Number(val.rev) || 0;
+        if (wcApplyRemote(val)) return;
+        if ((Number(wc.data.rev) || 0) > wc.seen) wcPush();  // 오프라인에 고친 내 목록이 더 최신
+      }, () => {
+        wc.syncState = { state: 'off', text: '동기화 안 됨 · 이 폰에만 저장' };
+        wcPaintSync();
+      });
+    } catch (e) {
+      wc.syncState = { state: 'off', text: '이 기기에만 저장' };
+      wcPaintSync();
+    }
+  }
+
+  function wcSetField(kind, id, field, value) {
+    const state = wc.data[kind];
+    if (!state) return;
+    const item = state.items.find((it) => it.id === id);
+    if (!item) return;
+    if (field === 'name') item.name = value;
+    else {
+      const n = wcNum(value);
+      if (n === null) return;
+      item.kg = n;
+    }
+    wcPaint();
+    wcStore();
+    wcPushSoon();
+  }
+
+  function wireWeightCalc() {
+    if (wc.wired) return;
+    const host = $('#weightCalc');
+    if (!host) return;
+    wc.wired = true;
+
+    host.addEventListener('input', (e) => {
+      const field = e.target.closest('[data-wc-field]');
+      if (field) {
+        wcSetField(field.dataset.kind, field.dataset.id, field.dataset.wcField, field.value);
+        return;
+      }
+      const total = e.target.closest('[data-wc-total]');
+      if (total) {
+        const n = wcNum(total.value);
+        if (n === null) return;
+        wc.data[total.dataset.wcTotal].total = n;
+        wcPaint(); wcStore(); wcPushSoon();
+      }
+    });
+
+    host.addEventListener('change', (e) => {
+      const kg = e.target.closest('[data-wc-field="kg"]');
+      if (kg && wcNum(kg.value) !== null) kg.value = kgText(wcNum(kg.value));
+    });
+
+    host.addEventListener('click', (e) => {
+      const del = e.target.closest('[data-wc-del]');
+      if (!del) return;
+      e.preventDefault();
+      if (del.dataset.armed !== '1') {
+        $$('[data-wc-del]', host).forEach((b) => {
+          if (b !== del) { delete b.dataset.armed; b.textContent = '✕'; b.classList.remove('is-armed'); }
+        });
+        del.dataset.armed = '1';
+        del.textContent = '삭제?';
+        del.classList.add('is-armed');
+        clearTimeout(wc.delTimer);
+        wc.delTimer = setTimeout(() => {
+          if (del.isConnected) { delete del.dataset.armed; del.textContent = '✕'; del.classList.remove('is-armed'); }
+        }, 3000);
+        return;
+      }
+      const kind = del.dataset.kind;
+      const id = del.dataset.wcDel;
+      const item = wc.data[kind].items.find((it) => it.id === id);
+      wc.data[kind].items = wc.data[kind].items.filter((it) => it.id !== id);
+      wcStore();
+      wcRender();
+      wcPushSoon();
+      toast(`${item && item.name ? item.name + ' ' : ''}삭제했어요`);
+    });
+
+    host.addEventListener('submit', (e) => {
+      const form = e.target.closest('[data-wc-add]');
+      if (!form) return;
+      e.preventDefault();
+      const kind = form.dataset.wcAdd;
+      const nameEl = form.querySelector('[data-wc-new="name"]');
+      const kgEl = form.querySelector('[data-wc-new="kg"]');
+      const name = (nameEl.value || '').trim();
+      const kg = wcNum(kgEl.value || '0');
+      if (!name) { nameEl.focus(); toast('아이템 이름을 먼저 적어 주세요'); return; }
+      if (kg === null) { kgEl.focus(); toast('무게는 숫자로 적어 주세요'); return; }
+      wc.data[kind].items.push({
+        id: `u-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`,
+        name, kg, note: ''
+      });
+      wcStore();
+      wcRender();
+      wcPushSoon();
+      toast(`${name} ${kgText(kg)}kg 추가했어요`);
+    });
+
+    host.addEventListener('focusout', () => {
+      setTimeout(() => {
+        if (wc.pendingRender && !host.contains(document.activeElement)) {
+          wc.pendingRender = false;
+          wcRender();
+        }
+      }, 0);
+    });
+  }
+
+  function renderWeightCalc() {
+    const host = $('#weightCalc');
+    if (!host) return;
+    if (!wc.data) wc.data = wcLoad();
+    wcRender();
+    wireWeightCalc();
+    wcInitSync();
+  }
+
   /* ---------------- tabs ---------------- */
   function showTab(name, push = true) {
     const panel = $(`#panel-${name}`);
@@ -738,6 +1100,7 @@
     renderItinerary();
     renderMapFilters();
     renderShopping();
+    renderWeightCalc();
     renderDeparture();
     renderBooking();
     wireTabs();

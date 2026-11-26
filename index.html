@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;800&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="styles.css?v=20261125d">
+<link rel="stylesheet" href="styles.css?v=20261126a">
 </head>
 <body>
 <div class="app">
@@ -133,6 +133,11 @@
         <div id="shopBaggage" class="baggage"></div>
         <div id="packing" class="packing"></div>
         <div class="sec-head sec-head--tight">
+          <h2 id="weightCalcTitle">수하물 무게 계산기</h2>
+          <p>기내·위탁 무게를 아이템별로 넣고 빼면 사용·잔여가 바로 계산됩니다. 도완 · 명주 두 폰이 같은 목록을 실시간으로 봅니다.</p>
+        </div>
+        <div id="weightCalc" class="wcalc"></div>
+        <div class="sec-head sec-head--tight">
           <h2>실측 무게 &amp; 3종 포장 배치표</h2>
           <p>큰 것 셋을 다 살 때의 실제 무게와, 어느 가방에 넣을지.</p>
         </div>
@@ -212,6 +217,8 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="app.js?v=20261125d"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="app.js?v=20261126a"></script>
 </body>
 </html>
