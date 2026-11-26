@@ -868,7 +868,7 @@ ul,ol{padding:0;list-style:none}
   .tab__sub{font-size:8.5px}
 }
 @media (min-width:760px){
-  .tab__sub{display:none}
+  .tab__sub{display:inline;margin-left:4px;font-size:11px;opacity:.62}
 }
 .sec-head h2 .sec-head__sub{
   font-family:var(--sans);font-size:.6em;font-weight:700;
