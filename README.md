@@ -25,11 +25,12 @@ data/trip.json
     └ items[]  time, title, place, kind, lat, lng, maps, hours,
                smoking, reservation, distance, memo, optional
   shopping  쇼핑 카드·주의사항·포장 팁·체크리스트
-            baby 카테고리(그룹별 품목·가격·구매처), weightCalc(무게 계산기 기본값·TIP),
-            weights(실측 무게), luggage(포장 배치), payment(결제 카드·혜택), links(참고 링크)
+            baby 카테고리(그룹별 품목·가격·구매처), weightCalc(무게 계산기 기본값·TIP·packPlan/packKeep 포장 플랜),
+            weights(실측 무게), luggage(포장 배치), payment(결제 카드·혜택), links(참고 링크),
+            refShots(쇼핑 탭 맨 아래 참고 이미지)
   departure 출국가방 체크리스트 — facts(핵심 수치), groups[](id·icon·name·sub·items[label·tag·note]),
             notesTitle·notesLead·notes(규정 메모). 체크 키는 `dep:<groupId>:<index>`
-  booking   예약 알림·메모
+  booking   예약 알림·메모, airportTransfer(귀국일 공항 이동 — fares 택시 요금 비교, tips 우버·정액 송영 주의)
 ```
 
 - `kind`: `food` `meal` `shop` `sight` `move` `stay` `pack` 중 하나
