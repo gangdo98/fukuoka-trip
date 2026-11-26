@@ -1003,7 +1003,7 @@
         clearTimeout(wc.delTimer);
         wc.delTimer = setTimeout(() => {
           if (del.isConnected) { delete del.dataset.armed; del.textContent = '✕'; del.classList.remove('is-armed'); }
-        }, 3000);
+        }, 5000);
         return;
       }
       const kind = del.dataset.kind;
