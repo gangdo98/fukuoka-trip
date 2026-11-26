@@ -744,7 +744,7 @@
     const one = (src, fb, kind) => {
       const s = src && typeof src === 'object' ? src : {};
       const list = Array.isArray(s.items) ? s.items
-        : (s.items && typeof s.items === 'object' ? Object.keys(s.items).map((k) => s.items[k]) : fb.items);
+        : (s.items && typeof s.items === 'object' ? Object.keys(s.items).map((k) => s.items[k]) : []);
       const total = Number(s.total);
       return {
         total: isFinite(total) && total >= 0 ? Math.round(total * 10) / 10 : fb.total,
