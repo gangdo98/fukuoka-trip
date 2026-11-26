@@ -9,14 +9,14 @@
   .row{display:flex;gap:10px;padding:10px;align-items:flex-start}
   figure{margin:0;width:390px}
   figcaption{font-weight:700;margin-bottom:6px}
-  iframe{width:390px;height:900px;border:1px solid #888;background:#fff;display:block}
+  iframe{width:390px;height:1100px;border:1px solid #888;background:#fff;display:block}
 </style>
 </head>
 <body>
 <div class="row">
   <figure>
     <figcaption id="cap">390px</figcaption>
-    <iframe id="f" src="./?v=20261126c#shopping" title="390"></iframe>
+    <iframe id="f" src="./?v=20261126d#shopping" title="390"></iframe>
   </figure>
 </div>
 <script>
@@ -25,7 +25,7 @@
   const hash = q.get('h') || 'shopping';
   const frame = document.getElementById('f');
   document.getElementById('cap').textContent = '390px · ' + hash + (target ? ' / ' + target : '');
-  frame.src = './?v=' + (q.get('v') || '20261126c') + '#' + hash;
+  frame.src = './?v=' + (q.get('v') || '20261126d') + '#' + hash;
   frame.addEventListener('load', () => {
     const d = frame.contentDocument;
     const w = frame.contentWindow;
