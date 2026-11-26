@@ -22,6 +22,7 @@
 <script>
   const q = new URLSearchParams(location.search);
   const target = q.get('t');
+  const off = Number(q.get('o') || 0);
   const hash = q.get('h') || 'shopping';
   const frame = document.getElementById('f');
   document.getElementById('cap').textContent = '390px · ' + hash + (target ? ' / ' + target : '');
@@ -33,7 +34,7 @@
       if (!target) return;
       const el = d.getElementById(target);
       if (!el) return;
-      w.scrollTo(0, el.getBoundingClientRect().top + w.scrollY - 8);
+      w.scrollTo(0, el.getBoundingClientRect().top + w.scrollY - 8 + off);
     };
     setTimeout(go, 300);
     setTimeout(go, 1200);
