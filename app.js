@@ -220,9 +220,17 @@
   }
 
   /* ---------------- map ---------------- */
+  function mapDays() {
+    const list = trip.days.slice();
+    if (trip.maybe && Array.isArray(trip.maybe.items) && trip.maybe.items.length) {
+      list.push(Object.assign({ id: 'maybe', dayNo: null, dateShort: '고민중', color: '#8A8A8A', travelmode: 'walking' }, trip.maybe));
+    }
+    return list;
+  }
+
   function buildMapLayers() {
     const allBounds = L.latLngBounds([]);
-    trip.days.forEach((day) => {
+    mapDays().forEach((day) => {
       const pts = [];
       const seen = new Set();
       const markers = [];
@@ -238,14 +246,14 @@
         num += 1;
         const icon = L.divIcon({
           className: '',
-          html: `<div class="pin${it.optional ? ' pin--opt' : ''}" style="--pin:${day.color}">${num}</div>`,
+          html: `<div class="pin${it.optional ? ' pin--opt' : ''}" style="--pin:${day.color}">${day.id === 'maybe' ? '?' : num}</div>`,
           iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -14]
         });
         const m = L.marker([it.lat, it.lng], { icon, title: it.title, alt: it.title });
         const link = it.maps || (it.place ? mapsLink(`${it.place}, Fukuoka`) : mapsLink(it.title));
         m.bindPopup(`
           <div class="pop" style="--pin:${day.color}">
-            <span class="pop__day">DAY ${day.dayNo} · ${esc(it.time || '')}</span>
+            <span class="pop__day">${day.id === 'maybe' ? '고민중' : 'DAY ' + day.dayNo} · ${esc(it.time || '')}</span>
             <strong class="pop__title">${esc(it.title)}</strong>
             ${it.hours ? `<p class="pop__meta">${esc(it.hours)}</p>` : ''}
             ${it.distance ? `<p class="pop__meta">${esc(it.distance)}</p>` : ''}
@@ -255,12 +263,15 @@
       });
 
       if (pts.length) {
-        const line = L.polyline(pts, {
-          color: day.color, weight: 3, opacity: 0.72,
-          lineJoin: 'round', dashArray: day.dayNo === 4 ? '6 6' : null
-        });
         const bounds = L.latLngBounds(pts);
         allBounds.extend(bounds);
+        let line = null;
+        if (day.id !== 'maybe' && pts.length > 1) {
+          line = L.polyline(pts, {
+            color: day.color, weight: 3, opacity: 0.72,
+            lineJoin: 'round', dashArray: day.dayNo === 4 ? '6 6' : null
+          });
+        }
         dayLayers.set(day.id, { markers, line, bounds });
       }
     });
@@ -337,7 +348,8 @@
     const host = $('#mapFilters');
     const legend = $('#mapLegend');
     host.innerHTML = `<button class="fchip is-active" type="button" data-filter="all">전체</button>` +
-      trip.days.map((d) => `<button class="fchip" type="button" data-filter="${esc(d.id)}" data-day style="--day:${d.color}">Day ${d.dayNo}</button>`).join('');
+      trip.days.map((d) => `<button class="fchip" type="button" data-filter="${esc(d.id)}" data-day style="--day:${d.color}">Day ${d.dayNo}</button>`).join('') +
+      (trip.maybe ? `<button class="fchip" type="button" data-filter="maybe" data-day style="--day:#8A8A8A">고민중</button>` : '');
     host.addEventListener('click', (e) => {
       const btn = e.target.closest('.fchip');
       if (!btn) return;
@@ -345,7 +357,8 @@
       applyFilter(btn.dataset.filter);
     });
     legend.innerHTML = `<span><i style="background:#241F1B"></i>호텔 일 팔라조</span>` +
-      trip.days.map((d) => `<span><i style="background:${d.color}"></i>Day ${d.dayNo} · ${esc(d.dateShort)}</span>`).join('');
+      trip.days.map((d) => `<span><i style="background:${d.color}"></i>Day ${d.dayNo} · ${esc(d.dateShort)}</span>`).join('') +
+      (trip.maybe ? `<span><i style="background:#8A8A8A"></i>고민중 · 언제든 볼 곳</span>` : '');
   }
 
   /* ---------------- shopping ---------------- */

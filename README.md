@@ -22,6 +22,7 @@ data/trip.json
   hotel     숙소 정보(좌표 포함), reservation(예약번호·투숙객·결제·취소 조건)
   flights   항공편
   days[]    일자별 일정
+  maybe     지도 `고민중` 필터용 장소(일정에는 넣지 않는 후보 — 오호리공원·토카도)
     └ items[]  time, title, place, kind, lat, lng, maps, hours,
                smoking, reservation, distance, memo, optional
   shopping  쇼핑 카드·주의사항·포장 팁·체크리스트
@@ -38,6 +39,7 @@ data/trip.json
 - `lat`/`lng`가 있으면 지도 핀과 경로가 자동 생성됩니다.
 - `maps`를 비우면 `place` 이름으로 Google 지도 검색 링크를 만듭니다.
 - `optional: true`는 "여유 시" 항목(점선 핀).
+- `maybe.items[]`는 일정표에는 나오지 않고 지도 `고민중` 필터에서만 `?` 핀으로 보입니다(id·color 기본값은 코드에서 채움).
 - `hotel.reservation`, `meta.fx`, `shopping.payment`가 있으면 숙소 카드의 예약 박스와 환율 기준 줄, 결제 카드 섹션이 표시됩니다.
 - 바꾼 날 `meta.updated`도 같이 고쳐 주세요.
 
