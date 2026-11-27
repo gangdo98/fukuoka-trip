@@ -37,7 +37,8 @@ h1,h2,h3,p,ul,ol{margin:0}
 ul,ol{padding:0;list-style:none}
 :focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:6px}
 
-.app{overflow-x:hidden}
+/* overflow-x:clip — hidden은 스크롤 컨테이너를 만들어 .tabs{position:sticky;top:0}가 풀린다 */
+.app{overflow-x:clip}
 
 /* ---------- Hero ---------- */
 .hero{
