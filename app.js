@@ -92,7 +92,7 @@
     const url = location.href.split('#')[0];
     const payload = {
       title: '후쿠오카 3박 4일 · 2027.01.07–10',
-      text: '도완 & 아내의 겨울 후쿠오카 일정',
+      text: '겨울 후쿠오카 3박 4일 일정',
       url
     };
     if (navigator.share) {
@@ -362,7 +362,7 @@
   }
 
   /* ---------------- shopping ---------------- */
-  /* 육아용품 구매 체크 — 도완 폰 ↔ 명주 폰 (tosil_story/trip/fukuoka/shopping) */
+  /* 육아용품 구매 체크 — 두 폰 실시간 공유 (tosil_story/trip/fukuoka/shopping) */
   const BC_KEY = 'fukuoka-baby-checks-v1';
   const BC_PATH = 'tosil_story/trip/fukuoka/shopping';
   const bc = {
@@ -827,8 +827,8 @@
       <div class="hotel-card__body">
         ${h.reservation ? `<div class="hotel-card__res">
           <p class="hotel-card__reshead">✓ ${esc(h.reservation.status)}</p>
-          <div class="hotel-card__row"><b>예약번호</b><span>${esc(h.reservation.id)}</span></div>
-          <div class="hotel-card__row"><b>투숙객</b><span>${esc(h.reservation.guest)}</span></div>
+          ${h.reservation.id ? `<div class="hotel-card__row"><b>예약번호</b><span>${esc(h.reservation.id)}</span></div>` : ''}
+          ${h.reservation.guest ? `<div class="hotel-card__row"><b>투숙객</b><span>${esc(h.reservation.guest)}</span></div>` : ''}
           <div class="hotel-card__row"><b>객실</b><span>${esc(h.reservation.room)}</span></div>
           ${h.reservation.extras ? `<div class="hotel-card__row"><b>포함</b><span>${esc(h.reservation.extras)}</span></div>` : ''}
           <div class="hotel-card__row"><b>결제</b><span>${esc(h.reservation.paid)}</span></div>
@@ -1141,7 +1141,7 @@
     });
   }
 
-  /* ---------------- 수하물 무게 계산기 (도완 폰 ↔ 명주 폰) ---------------- */
+  /* ---------------- 수하물 무게 계산기 (두 폰 실시간 공유) ---------------- */
   const WC_KEY = 'fukuoka-luggage-v1';
   const WC_FB_CONFIG = {
     apiKey: 'AIzaSyCgZ6AYYIxzbEe135USUhTX_pB684zita8',
