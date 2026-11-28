@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#C8402F">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="후쿠오카 여행">
 <title>후쿠오카 3박 4일 · 2027.01.07–10</title>
 <meta name="description" content="2027년 1월 7일~10일 김해–후쿠오카 3박 4일. 일자별 타임라인과 지도, 육아용품 쇼핑·포장 팁, 항공·숙소·예약 정보를 한 페이지에.">
 <link rel="canonical" href="https://gangdo98.github.io/fukuoka-trip/">
@@ -24,6 +30,7 @@
 <meta name="twitter:image" content="https://gangdo98.github.io/fukuoka-trip/assets/og-image.jpg">
 
 <link rel="icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23C8402F'/%3E%3Ctext x='50' y='70' font-size='56' text-anchor='middle' fill='%23FBF7F0' font-family='serif'%3E%E7%A6%8F%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -252,5 +259,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script src="app.js?v=20261128d"></script>
+<script>
+  /* PWA — 서비스 워커 등록. 실패해도 화면 기능은 그대로입니다. */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (err) {
+        console.warn('서비스 워커 등록 실패', err);
+      });
+    });
+  }
+</script>
 </body>
 </html>
