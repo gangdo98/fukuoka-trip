@@ -1569,6 +1569,17 @@
     if (location.hash === '#map') showTab('map', false);
   }
 
+  /* ---------------- 하단 ↑ 버튼 ---------------- */
+  function bindToTop() {
+    const btn = $('#toTop');
+    if (!btn) return;
+    const sync = () => btn.classList.toggle('is-on', window.scrollY > 260);
+    window.addEventListener('scroll', sync, { passive: true });
+    sync();
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }
+  bindToTop();
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
