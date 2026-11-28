@@ -36,7 +36,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;800&display=swap">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="./vendor/leaflet.css">
 <link rel="stylesheet" href="styles.css?v=20261128d">
 </head>
 <body>
@@ -110,7 +110,7 @@
           <div id="map" role="application" aria-label="후쿠오카 여행 지도"></div>
         </div>
         <div class="map-legend" id="mapLegend"></div>
-        <p class="map-note">지도 타일 © OpenStreetMap contributors. 핀 위치는 각 장소의 Google 지도 좌표 기준입니다.</p>
+        <p class="map-note">지도 타일 © OpenStreetMap contributors. 핀 위치는 각 장소의 Google 지도 좌표 기준입니다. 지도 배경(타일)은 인터넷이 있을 때만 표시되고, 오프라인에서는 핀과 동선만 보입니다.</p>
       </div>
     </section>
 
@@ -255,28 +255,34 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./vendor/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script src="app.js?v=20261128d"></script>
 <script>
   /* PWA — 서비스 워커 등록. 실패해도 화면 기능은 그대로입니다.
-     등록되면 이 화면이 실제로 쓴 css·js·json·이미지를 워커에 넘겨 미리 캐시해,
-     처음 설치한 날부터 비행기 모드에서도 열립니다. */
+     sw.js 가 설치 때 화면 자산을 미리 받아 두고, 여기서는 이 화면이 실제로 쓴
+     css·js·json·이미지를 한 번 더 확인해 빠진 것만 보충합니다. */
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('./sw.js').then(function (reg) {
-        return navigator.serviceWorker.ready.then(function () { return reg; });
-      }).then(function (reg) {
+      function post(sw) {
         try {
           var base = location.origin + location.pathname.replace(/[^/]*$/, '');
           var urls = performance.getEntriesByType('resource').map(function (e) { return e.name; })
             .filter(function (u) {
               return u.indexOf(base) === 0 && /\.(css|js|json|png|jpe?g|webp|svg|woff2?)(\?|$)/i.test(u);
             });
-          var sw = reg.active || navigator.serviceWorker.controller;
           if (sw && urls.length) sw.postMessage({ type: 'CACHE_URLS', urls: urls });
         } catch (e) {}
+      }
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function () {
+        return navigator.serviceWorker.ready;
+      }).then(function (reg) {
+        var sw = navigator.serviceWorker.controller || reg.active;
+        if (sw) { post(sw); return; }
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          post(navigator.serviceWorker.controller);
+        }, { once: true });
       }).catch(function (err) {
         console.warn('서비스 워커 등록 실패', err);
       });
